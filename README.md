@@ -6,7 +6,8 @@ Quick setup (Windows PowerShell):
 
 ```powershell
 # create and activate venv
-python -m venv .venv; .\.venv\Scripts\Activate
+python -m venv venv
+.\venv\Scripts\Activate
 
 # install dependencies
 pip install -r requirements.txt
