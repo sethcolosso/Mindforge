@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindForge</title>
+    <link rel="stylesheet" href="{% static 'api/css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <img src="{% static 'api/assets/logo.png' %}" alt="MindForge Logo" class="logo-icon">
+                <span class="logo-text">MINDFORGE</span>
+            </div>
+            <img src="{% static 'api/assets/profile.png' %}" alt="User Profile" class="profile-pic">
+        </header>
+
+        <!-- Main dashboard grid: left stats | right greeting + mood -->
+        <div class="dashboard-grid">
+            <!-- LEFT: Stats cards -->
+            <aside class="left-column">
+                <div class="stats-card streak">
+                    <h3 class="stats-title">Daily Streak</h3>
+                    <div class="stats-value">7<span class="stats-unit">days</span></div>
+                </div>
+
+                <div class="stats-card mood">
+                    <h3 class="stats-title">Average Mood</h3>
+                    <div class="stats-value">82<span class="stats-unit">%</span></div>
+                </div>
+
+                <div class="stats-card exercises">
+                    <h3 class="stats-title">Exercises Today</h3>
+                    <div class="stats-value">3</div>
+                </div>
+            </aside>
+
+            <!-- RIGHT: Greeting + Mood Today -->
+            <main class="right-column">
+                <h1 class="greeting">Good Afternoon,</h1>
+                <p class="tagline">Train your mind like you train your body</p>
+
+                <section class="card mood-card">
+                    <h2 class="section-title">Your MOOD TODAY</h2>
+                    <div class="mood-content">
+                        <div class="mood-list">
+                            <div class="mood-item"><span class="dot happy"></span> Happy</div>
+                            <div class="mood-item"><span class="dot stressed"></span> Stressed</div>
+                            <div class="mood-item"><span class="dot calm"></span> Calm</div>
+                        </div>
+                        <canvas id="pieChart" width="280" height="280"></canvas>
+                    </div>
+                    <p class="reflection">Daily Reflection</p>
+                    <button class="record-btn">RECORD</button>
+                </section>
+            </main>
+        </div>
+
+        <!-- Daily Exercises – full width below -->
+        <section class="exercises">
+            <h2 class="section-title">DAILY EXERCISES</h2>
+            <div class="exercise-grid">
+                <div class="exercise-card">
+                    <img src="{% static 'api/assets/brain_icon.png' %}" alt="Focus Reset" class="exercise-icon">
+                    <p>Focus Reset</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="{% static 'api/assets/star_icon.png' %}" alt="Ease Anxiety" class="exercise-icon">
+                    <p>Ease Anxiety</p>
+                </div>
+                <div class="exercise-card">
+                    <img src="{% static 'api/assets/mountains_icon.png' %}" alt="Visualization" class="exercise-icon">
+                    <p>Visualization</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Your Coach – full width -->
+        <section class="coach">
+            <h2 class="section-title">YOUR COACH</h2>
+            <div class="coach-card">
+                <img src="{% static 'api/assets/bot_icon.png' %}" alt="Coach Bot" class="bot-icon">
+                <p>Ask me anything...</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="{% static 'api/js/scripts.js' %}"></script>
+</body>
+</html>

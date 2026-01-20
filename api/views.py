@@ -14,8 +14,14 @@ from .serializers import (
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from .services.openai_service import get_coach_recommendation
+from django.shortcuts import render
 
-
+def home(request):
+    # Add context if needed (e.g., dynamic data from API/models)
+    context = {
+        'greeting': 'Good Afternoon,',  # Can make dynamic based on time
+    }
+    return render(request, 'api/home.html', context)
 class RegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
 
