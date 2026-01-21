@@ -12,16 +12,35 @@ from .serializers import (
     BadgeSerializer
 )
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.views import APIView
-from .services.openai_service import get_coach_recommendation
+from django.utils import timezone
 from django.shortcuts import render
+from .services.openai_service import get_coach_recommendation
+
 
 def home(request):
-    # Add context if needed (e.g., dynamic data from API/models)
+    """
+    Renders the main dashboard page with dynamic time-based greeting.
+    """
+    now = timezone.now()  # Use timezone-aware datetime
+    hour = now.hour
+
+    if 5 <= hour < 12:
+        greeting = "Good Morning,"
+    elif 12 <= hour < 17:
+        greeting = "Good Afternoon,"
+    elif 17 <= hour < 22:
+        greeting = "Good Evening,"
+    else:
+        greeting = "Good Night,"
+
     context = {
-        'greeting': 'Good Afternoon,',  # Can make dynamic based on time
+        'greeting': greeting,
+        # You can add more context variables here later if needed
+        # e.g. 'user': request.user if request.user.is_authenticated else None,
     }
     return render(request, 'api/home.html', context)
+
+
 class RegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
 
