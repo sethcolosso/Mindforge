@@ -1,5 +1,4 @@
 # --- Python ---
-__pycache__/
 *.py[cod]
 *$py.class
 
@@ -64,7 +63,6 @@ db.sqlite3-journal
 
 # Django static and media (generated)
 staticfiles/
-static/
 media/
 
 # If using Django collectstatic into a different folder, add it here

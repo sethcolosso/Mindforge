@@ -1,0 +1,214 @@
+/* Reset */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background: #0A0E21;
+    color: white;
+    font-family: system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 32px 24px;
+}
+
+/* Container – wide but not unlimited */
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+}
+
+.logo { display: flex; align-items: center; gap: 16px; }
+.logo-icon { width: 56px; height: 56px; }
+.logo-text {
+    color: #00BFA5;
+    font-size: 36px;
+    font-weight: 800;
+}
+.profile-pic { width: 56px; height: 56px; border-radius: 50%; }
+
+/* ── MAIN DASHBOARD GRID ── */
+.dashboard-grid {
+    display: grid !important;
+    grid-template-columns: 380px 1fr !important;   /* fixed left width + flexible right */
+    gap: 48px !important;
+    margin-bottom: 64px !important;
+    min-height: 500px;                             /* prevent collapse */
+}
+
+/* Left column – stats */
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.stats-card {
+    background: #111827;
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+}
+
+.stats-title {
+    font-size: 1.25rem;
+    color: #9CA3AF;
+    margin-bottom: 16px;
+}
+
+.stats-value {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.stats-unit {
+    font-size: 1.8rem;
+    color: #9CA3AF;
+    margin-left: 12px;
+}
+
+/* Right column – greeting + mood */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.greeting {
+    font-size: 4.2rem;
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+.tagline {
+    font-size: 1.5rem;
+    color: #9CA3AF;
+    margin-bottom: 32px;
+}
+
+/* Mood card */
+.card {
+    background: #111827;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+}
+
+.mood-content {
+    display: flex;
+    align-items: center;
+    gap: 64px;
+}
+
+.mood-list .mood-item {
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+}/* Make emojis bigger and slightly spaced */
+.mood-item {
+    font-size: 1.2rem;
+}
+
+.mood-item::after {
+    font-size: 1.4rem;
+    margin-left: 8px;
+}
+
+/* Or color specific moods (optional) */
+.mood-item:has(.happy) {
+    color: #fbbf24;  /* yellow/orange */
+}
+
+.mood-item:has(.stressed) {
+    color: #ef4444;  /* red */
+}
+
+.mood-item:has(.calm) {
+    color: #10b981;  /* green/teal */
+}
+
+/* For exercise cards */
+.exercise-card p {
+    font-size: 1.15rem;
+}
+
+.exercise-card p::after {
+    font-size: 1.4rem;
+    margin-left: 6px;
+}
+.dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 16px;
+}
+
+#pieChart {
+    max-width: 380px !important;
+    max-height: 380px !important;
+}
+
+.record-btn {
+    margin-top: 24px;
+    background: #00BFA5;
+    color: #0A0E21;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Exercises & Coach – full width below */
+.exercises {
+    margin-top: 64px;
+}
+
+.exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 32px;
+}
+
+.exercise-card {
+    background: #111827;
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+}
+
+.exercise-icon { width: 80px; height: 80px; margin-bottom: 20px; }
+
+/* RESPONSIVE – stack on smaller screens */
+@media (max-width: 1100px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .mood-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #pieChart {
+        max-width: 320px !important;
+        align-self: center;
+    }
+}
+
+@media (max-width: 640px) {
+    body { padding: 16px; }
+    .greeting { font-size: 3rem; }
+    .stats-value { font-size: 4rem; }
+}
