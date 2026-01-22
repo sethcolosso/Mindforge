@@ -1,2 +1,0 @@
-# Mindforge
-mental health app
