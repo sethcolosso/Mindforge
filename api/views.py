@@ -104,3 +104,15 @@ class CoachRecommendationView(APIView):
 
         result = get_coach_recommendation(profile_goals=profile_goals, recent_mood=recent_mood)
         return Response(result)
+
+
+# ────────────────────────────────────────────────
+# Focus Reset Page View – This MUST be OUTSIDE any class
+# ────────────────────────────────────────────────
+
+def focus_reset_view(request):
+    context = {
+        'title': 'Focus Reset',
+        'default_duration': 25 * 60,  # 25 minutes in seconds
+    }
+    return render(request, 'api/exercises/focus_reset.html', context)

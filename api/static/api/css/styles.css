@@ -9,7 +9,7 @@ body {
     padding: 32px 24px;
 }
 
-/* Container – wide but not unlimited */
+/* Container */
 .container {
     max-width: 1600px;
     margin: 0 auto;
@@ -32,16 +32,16 @@ body {
 }
 .profile-pic { width: 56px; height: 56px; border-radius: 50%; }
 
-/* ── MAIN DASHBOARD GRID ── */
+/* Dashboard grid */
 .dashboard-grid {
-    display: grid !important;
-    grid-template-columns: 380px 1fr !important;   /* fixed left width + flexible right */
-    gap: 48px !important;
-    margin-bottom: 64px !important;
-    min-height: 500px;                             /* prevent collapse */
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 48px;
+    margin-bottom: 64px;
+    min-height: 500px;
 }
 
-/* Left column – stats */
+/* Left stats */
 .left-column {
     display: flex;
     flex-direction: column;
@@ -56,42 +56,19 @@ body {
     box-shadow: 0 12px 32px rgba(0,0,0,0.45);
 }
 
-.stats-title {
-    font-size: 1.25rem;
-    color: #9CA3AF;
-    margin-bottom: 16px;
-}
+.stats-title { font-size: 1.25rem; color: #9CA3AF; margin-bottom: 16px; }
+.stats-value { font-size: 5rem; font-weight: 800; line-height: 1; }
+.stats-unit { font-size: 1.8rem; color: #9CA3AF; margin-left: 12px; }
 
-.stats-value {
-    font-size: 5rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.stats-unit {
-    font-size: 1.8rem;
-    color: #9CA3AF;
-    margin-left: 12px;
-}
-
-/* Right column – greeting + mood */
+/* Right – greeting + mood */
 .right-column {
     display: flex;
     flex-direction: column;
     gap: 32px;
 }
 
-.greeting {
-    font-size: 4.2rem;
-    font-weight: 700;
-    line-height: 1.05;
-}
-
-.tagline {
-    font-size: 1.5rem;
-    color: #9CA3AF;
-    margin-bottom: 32px;
-}
+.greeting { font-size: 4.2rem; font-weight: 700; line-height: 1.05; }
+.tagline { font-size: 1.5rem; color: #9CA3AF; margin-bottom: 32px; }
 
 /* Mood card */
 .card {
@@ -101,10 +78,7 @@ body {
     box-shadow: 0 12px 32px rgba(0,0,0,0.45);
 }
 
-.section-title {
-    font-size: 1.8rem;
-    margin-bottom: 24px;
-}
+.section-title { font-size: 1.8rem; margin-bottom: 24px; }
 
 .mood-content {
     display: flex;
@@ -112,41 +86,17 @@ body {
     gap: 64px;
 }
 
-.mood-list .mood-item {
-    font-size: 1.35rem;
-    margin-bottom: 18px;
-}/* Make emojis bigger and slightly spaced */
-.mood-item {
-    font-size: 1.2rem;
-}
+.mood-list .mood-item { font-size: 1.35rem; margin-bottom: 18px; }
 
-.mood-item::after {
-    font-size: 1.4rem;
-    margin-left: 8px;
-}
+/* Emojis */
+.mood-item { font-size: 1.2rem; }
+.mood-item::after { font-size: 1.4rem; margin-left: 8px; }
 
-/* Or color specific moods (optional) */
-.mood-item:has(.happy) {
-    color: #fbbf24;  /* yellow/orange */
-}
+/* Mood colors */
+.mood-item:has(.happy)   { color: #fbbf24; }
+.mood-item:has(.stressed) { color: #ef4444; }
+.mood-item:has(.calm)    { color: #10b981; }
 
-.mood-item:has(.stressed) {
-    color: #ef4444;  /* red */
-}
-
-.mood-item:has(.calm) {
-    color: #10b981;  /* green/teal */
-}
-
-/* For exercise cards */
-.exercise-card p {
-    font-size: 1.15rem;
-}
-
-.exercise-card p::after {
-    font-size: 1.4rem;
-    margin-left: 6px;
-}
 .dot {
     width: 20px;
     height: 20px;
@@ -172,43 +122,83 @@ body {
     cursor: pointer;
 }
 
-/* Exercises & Coach – full width below */
+/* ── DAILY EXERCISES – HORIZONTAL LAYOUT ── */
 .exercises {
     margin-top: 64px;
 }
 
-.exercise-grid {
+.exercises-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 32px;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));  /* 3 columns – horizontal */
+    gap: 32px 24px;
+    margin-top: 24px;
+    justify-items: center;
 }
 
+/* Cards */
 .exercise-card {
     background: #111827;
     border-radius: 20px;
-    padding: 32px;
+    padding: 32px 24px;
     text-align: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 340px;
 }
 
-.exercise-icon { width: 80px; height: 80px; margin-bottom: 20px; }
+.exercise-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 50px rgba(0, 191, 165, 0.22);
+}
 
-/* RESPONSIVE – stack on smaller screens */
-@media (max-width: 1100px) {
+.exercise-icon {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.exercise-card:hover .exercise-icon {
+    transform: scale(1.12);
+}
+
+.exercise-card p {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+/* Responsive – only stack on very small screens */
+@media (max-width: 1023px) {
     .dashboard-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr;
     }
     .mood-content {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
     }
     #pieChart {
         max-width: 320px !important;
-        align-self: center;
+    }
+    .exercises-grid {
+        grid-template-columns: repeat(2, minmax(240px, 1fr));  /* 2 columns on tablets */
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 479px) {
     body { padding: 16px; }
     .greeting { font-size: 3rem; }
     .stats-value { font-size: 4rem; }
+    .exercises-grid {
+        grid-template-columns: 1fr;  /* 1 column on phones */
+    }
+    .exercise-card {
+        max-width: none;
+        padding: 28px 20px;
+    }
+    .exercise-icon { width: 90px; height: 90px; }
 }

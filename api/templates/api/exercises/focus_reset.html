@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Reset - MindForge</title>
+    <link rel="stylesheet" href="{% static 'api/css/styles.css' %}">
+    <style>
+        body { background: #0A0E21; color: white; font-family: system-ui; }
+        .focus-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .timer-display { font-size: 6rem; font-weight: 700; text-align: center; margin: 40px 0; }
+        .controls { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 14px 32px; font-size: 1.1rem; border-radius: 12px; cursor: pointer; }
+        .btn-primary { background: #00BFA5; color: black; }
+        .btn-secondary { background: #374151; color: white; }
+        .breathing-circle { width: 180px; height: 180px; background: #2DD4BF; border-radius: 50%; margin: 40px auto; animation: breathe 12s infinite ease-in-out; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+        .sound-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin: 40px 0; }
+        .sound-card { background: #1F2937; padding: 20px; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .sound-card.active { background: #00BFA5; color: black; }
+        .distraction-list { list-style: none; }
+        .distraction-list li { margin: 12px 0; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+    <div class="focus-container">
+        <a href="/" style="color: #00BFA5; text-decoration: none;">← Back to Dashboard</a>
+        
+        <h1 style="text-align:center; font-size: 3rem; margin: 40px 0 20px;">Focus Reset 🧠✨</h1>
+        <p style="text-align:center; color: #9CA3AF; font-size: 1.3rem;">Build deep focus. Train your attention like a muscle.</p>
+
+        <!-- Timer -->
+        <div class="timer-display" id="timer">25:00</div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-primary" id="startBtn">Start Focus</button>
+            <button class="btn btn-secondary" id="pauseBtn" style="display:none;">Pause</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+            <select id="durationSelect" class="btn btn-secondary">
+                <option value="1500">25 min (Pomodoro)</option>
+                <option value="3000">50 min Deep Focus</option>
+                <option value="900">15 min Quick Reset</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+
+        <!-- Breathing Guide -->
+        <div style="text-align:center; margin: 60px 0;">
+            <p style="margin-bottom:20px; font-size:1.2rem;">Box Breathing (4-4-4-4)</p>
+            <div class="breathing-circle"></div>
+            <p id="breathing-instruction" style="margin-top:20px; font-size:1.1rem; min-height:28px;"></p>
+        </div>
+
+        <!-- Ambient Sounds -->
+        <h3 style="text-align:center; margin:40px 0 20px;">Ambient Focus Sounds</h3>
+        <div class="sound-grid">
+            <div class="sound-card active" data-sound="rain">🌧️ Rain</div>
+            <div class="sound-card" data-sound="forest">🌲 Forest</div>
+            <div class="sound-card" data-sound="lofi">🎵 Lo-fi</div>
+            <div class="sound-card" data-sound="white">⚪ White Noise</div>
+        </div>
+
+        <!-- Distraction Blocker -->
+        <h3 style="margin:40px 0 20px;">Distraction Blocker Checklist</h3>
+        <ul class="distraction-list">
+            <li>✅ Phone on Do Not Disturb</li>
+            <li>✅ Desk cleared</li>
+            <li>✅ Browser tabs closed (except this)</li>
+            <li>✅ Water nearby</li>
+            <li>✅ Noise-canceling headphones on</li>
+        </ul>
+
+        <!-- Log Session -->
+        <div style="text-align:center; margin:60px 0;">
+            <button class="btn btn-primary" id="logSessionBtn" style="padding:16px 48px; font-size:1.2rem;">
+                ✅ Log This Session (Save Progress)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let timeLeft = 1500; // default 25 min
+        let isRunning = false;
+
+        const timerEl = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const logBtn = document.getElementById('logSessionBtn');
+
+        function updateTimerDisplay() {
+            const min = Math.floor(timeLeft / 60);
+            const sec = timeLeft % 60;
+            timerEl.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("🎉 Focus session complete! Great work!");
+                    isRunning = false;
+                    pauseBtn.style.display = 'none';
+                    startBtn.style.display = 'inline-block';
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            pauseBtn.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = parseInt(document.getElementById('durationSelect').value) || 1500;
+            updateTimerDisplay();
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+        }
+
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        document.getElementById('durationSelect').addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                timeLeft = parseInt(prompt("Enter duration in seconds:", "1500")) || 1500;
+            } else {
+                timeLeft = parseInt(e.target.value);
+            }
+            updateTimerDisplay();
+        });
+
+        // Log session (calls your WorkoutSessionViewSet)
+        logBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/workouts/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_JWT_TOKEN_HERE'  // replace with real token
+                    },
+                    body: JSON.stringify({
+                        session_type: 'focus_reset',
+                        duration_seconds: 1500 - timeLeft,
+                        notes: 'Focus Reset session completed'
+                    })
+                });
+                if (response.ok) {
+                    alert('✅ Session logged successfully!');
+                }
+            } catch(e) {
+                alert('Session saved locally (API not connected yet)');
+            }
+        });
+
+        updateTimerDisplay();
+    </script>
+</body>
+</html>

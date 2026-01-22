@@ -48,10 +48,10 @@
                     <h2 class="section-title">YOUR MOOD TODAY</h2>
                     <div class="mood-content">
                         <div class="mood-list">
-                         <div class="mood-item"><span class="dot happy"></span> Happy 😊</div>
-                        <div class="mood-item"><span class="dot stressed"></span> Stressed 😣</div>
-                        <div class="mood-item"><span class="dot calm"></span> Calm 😌</div>
-                    </div>
+                            <div class="mood-item"><span class="dot happy"></span> Happy 😊</div>
+                            <div class="mood-item"><span class="dot stressed"></span> Stressed 😣</div>
+                            <div class="mood-item"><span class="dot calm"></span> Calm 😌</div>
+                        </div>
                         <canvas id="pieChart" width="280" height="280"></canvas>
                     </div>
                     <p class="reflection">Daily Reflection</p>
@@ -63,27 +63,31 @@
         <!-- Daily Exercises – full width below -->
         <section class="exercises">
             <h2 class="section-title">DAILY EXERCISES</h2>
-    <div class="exercise-grid">
-        <div class="exercise-card">
-        <img src="{% static 'api/assets/focus.webp' %}" alt="Focus Reset🧠✨" class="exercise-icon">
-        <p>Focus Reset</p>
-        </div>
-        <div class="exercise-card">
-        <img src="{% static 'api/assets/anxiety.jpg' %}" alt="Ease Anxiety🌬️😌" class="exercise-icon">
-        <p>Ease Anxiety </p>
-        </div>
-        <div class="exercise-card">
-        <img src="{% static 'api/assets/visualize.webp' %}" alt="Visualization👁️" class="exercise-icon">
-        <p>Visualization</p>
-        </div>
-    </div>
+            <div class="exercises-grid">
+                <div class="exercise-card" onclick="window.location.href='/exercises/focus-reset/'">
+                    <img src="{% static 'api/assets/focus.webp' %}" alt="Focus Reset" class="exercise-icon">
+                    <p>Focus Reset 🧠✨</p>
+                </div>
+                <div class="exercise-card" onclick="window.location.href='/exercises/ease-anxiety/'">
+                    <img src="{% static 'api/assets/anxiety.jpg' %}" alt="Ease Anxiety" class="exercise-icon">
+                    <p>Ease Anxiety 😮‍💨🕊️</p>
+                </div>
+                <div class="exercise-card" onclick="window.location.href='/exercises/visualization/'">
+                    <img src="{% static 'api/assets/visualize.webp' %}" alt="Visualization" class="exercise-icon">
+                    <p>Visualization 👁️</p>
+                </div>
+            </div>
         </section>
 
         <!-- Your Coach – full width -->
         <section class="coach">
             <h2 class="section-title">YOUR COACH</h2>
             <div class="coach-card">
-               <script defer data-relevanceai-share-id="bcbe5a/361a045b4ae0-465d-b26a-7835a319c7a2/2ea9a053-f456-4a2d-9b06-1fb89346c982" src="https://app.relevanceai.com/embed/chat-bubble.js" data-share-styles="hide_tool_steps=false&hide_file_uploads=false&hide_conversation_list=false&bubble_style=agent&primary_color=%232a293d&bubble_icon=pd%2Fchat&input_placeholder_text=Type+your+message...&hide_logo=false&hide_description=false" ></script>
+                <script defer 
+                    data-relevanceai-share-id="bcbe5a/361a045b4ae0-465d-b26a-7835a319c7a2/2ea9a053-f456-4a2d-9b06-1fb89346c982" 
+                    src="https://app.relevanceai.com/embed/chat-bubble.js" 
+                    data-share-styles="hide_tool_steps=false&hide_file_uploads=false&hide_conversation_list=false&bubble_style=agent&primary_color=%232a293d&bubble_icon=pd%2Fchat&input_placeholder_text=Type+your+message...&hide_logo=false&hide_description=false">
+                </script>
                 <p>Ask me anything...</p>
             </div>
         </section>
