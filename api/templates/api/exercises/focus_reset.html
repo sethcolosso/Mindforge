@@ -5,113 +5,288 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Reset - MindForge</title>
-    <link rel="stylesheet" href="{% static 'api/css/styles.css' %}">
-    <style>
-        body { background: #0A0E21; color: white; font-family: system-ui; }
-        .focus-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .timer-display { font-size: 6rem; font-weight: 700; text-align: center; margin: 40px 0; }
-        .controls { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 14px 32px; font-size: 1.1rem; border-radius: 12px; cursor: pointer; }
-        .btn-primary { background: #00BFA5; color: black; }
-        .btn-secondary { background: #374151; color: white; }
-        .breathing-circle { width: 180px; height: 180px; background: #2DD4BF; border-radius: 50%; margin: 40px auto; animation: breathe 12s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
-        .sound-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin: 40px 0; }
-        .sound-card { background: #1F2937; padding: 20px; border-radius: 16px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .sound-card.active { background: #00BFA5; color: black; }
-        .distraction-list { list-style: none; }
-        .distraction-list li { margin: 12px 0; font-size: 1.1rem; }
-    </style>
+    <link rel="stylesheet" href="{% static 'api/css/focus_reset.css' %}">
 </head>
 <body>
     <div class="focus-container">
-        <a href="/" style="color: #00BFA5; text-decoration: none;">← Back to Dashboard</a>
-        
-        <h1 style="text-align:center; font-size: 3rem; margin: 40px 0 20px;">Focus Reset 🧠✨</h1>
-        <p style="text-align:center; color: #9CA3AF; font-size: 1.3rem;">Build deep focus. Train your attention like a muscle.</p>
+        <a href="/" class="back-link">← Back to Dashboard</a>
 
-        <!-- Timer -->
-        <div class="timer-display" id="timer">25:00</div>
+        <h1>Focus Reset 🧠✨</h1>
+        <p class="subtitle">Train your attention like a muscle. Start with quick resets when focus slips.</p>
 
-        <!-- Controls -->
-        <div class="controls">
-            <button class="btn btn-primary" id="startBtn">Start Focus</button>
-            <button class="btn btn-secondary" id="pauseBtn" style="display:none;">Pause</button>
-            <button class="btn btn-secondary" id="resetBtn">Reset</button>
-            <select id="durationSelect" class="btn btn-secondary">
-                <option value="1500">25 min (Pomodoro)</option>
-                <option value="3000">50 min Deep Focus</option>
-                <option value="900">15 min Quick Reset</option>
-                <option value="custom">Custom</option>
+        <!-- 1. Quick Mind Clear – now fully working -->
+        <div class="quick-clear-section">
+            <h3>Quick Mind Clear (30 seconds)</h3>
+            <p class="quick-desc">Fast breathing reset + set one clear intention when your mind is scattered.</p>
+            <button class="btn btn-primary quick-btn" id="quickClearBtn">Start Quick Clear</button>
+            <div class="quick-result" id="quickResult" style="display:none;">
+                <p id="quickInstruction"></p>
+                <input type="text" id="intentionInput" placeholder="My focus intention is..." style="display:none; margin-top:12px; padding:10px; width:80%; max-width:400px;">
+                <button id="saveIntentionBtn" style="display:none; margin-top:12px;">Save & Continue</button>
+            </div>
+        </div>
+
+        <!-- 2. Pomodoro Timer -->
+        <div class="timer-section">
+            <h3 class="timer-title">Pomodoro Timer</h3>
+            <div class="timer-ring">
+                <svg class="progress-ring" viewBox="0 0 120 120">
+                    <circle class="progress-ring__circle-bg" cx="60" cy="60" r="54"></circle>
+                    <circle class="progress-ring__circle" id="progressRing" cx="60" cy="60" r="54"></circle>
+                </svg>
+                <div class="timer-display" id="timer">25:00</div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" id="startTimerBtn">Start Focus</button>
+                <button class="btn btn-secondary" id="pauseTimerBtn" style="display:none;">Pause</button>
+                <button class="btn btn-secondary" id="resetTimerBtn">Reset</button>
+                <select id="pomodoroType" class="btn btn-secondary">
+                    <option value="25">25 min + 5 min break</option>
+                    <option value="50">50 min + 10 min break</option>
+                    <option value="custom">Custom Time</option>
+                </select>
+            </div>
+            <p id="timerStatus" class="timer-status">Focus Mode</p>
+        </div>
+
+        <!-- 3. Breathing Reset – no checklist dependency -->
+        <div class="breathing-section">
+            <h3>Breathing Reset (6-3-6 Cycle)</h3>
+            <div class="breathing-circle-container">
+                <div class="breathing-circle" id="breathingCircle"></div>
+            </div>
+            <p id="breathingInstruction" class="breathing-instruction">Ready to reset? Click start.</p>
+            <button class="btn btn-primary" id="startBreathingBtn">Start Breathing Exercise</button>
+        </div>
+
+        <!-- 4. Environment Selector -->
+        <div class="environment-section">
+            <label for="environment">Where are you right now? (unlocks tailored checklist)</label>
+            <select id="environment" class="environment-select">
+                <option value="">Select your environment…</option>
+                <option value="office">Office / Workplace</option>
+                <option value="home-quiet">Home (quiet)</option>
+                <option value="home-noisy">Home (noisy / family / kids)</option>
+                <option value="public">Public place (cafe, library, bus, etc.)</option>
+                <option value="alone">Alone in a room</option>
+                <option value="with-people">With other people around</option>
+                <option value="outdoors">Outdoors / Park</option>
             </select>
         </div>
 
-        <!-- Breathing Guide -->
-        <div style="text-align:center; margin: 60px 0;">
-            <p style="margin-bottom:20px; font-size:1.2rem;">Box Breathing (4-4-4-4)</p>
-            <div class="breathing-circle"></div>
-            <p id="breathing-instruction" style="margin-top:20px; font-size:1.1rem; min-height:28px;"></p>
+        <!-- 5. Dynamic Distraction Checklist – only for ambient sounds -->
+        <div class="checklist-section" id="checklistSection" style="display:none;">
+            <h3 class="checklist-title">Distraction Blocker Checklist</h3>
+            <p class="checklist-hint">(Must be 100% complete to play ambient sounds)</p>
+            <ul class="distraction-list" id="checklistItems"></ul>
         </div>
 
-        <!-- Ambient Sounds -->
-        <h3 style="text-align:center; margin:40px 0 20px;">Ambient Focus Sounds</h3>
-        <div class="sound-grid">
-            <div class="sound-card active" data-sound="rain">🌧️ Rain</div>
-            <div class="sound-card" data-sound="forest">🌲 Forest</div>
-            <div class="sound-card" data-sound="lofi">🎵 Lo-fi</div>
-            <div class="sound-card" data-sound="white">⚪ White Noise</div>
+        <!-- 6. Ambient Sounds -->
+        <div class="sounds-section">
+            <h3 class="sounds-title">Ambient Focus Sounds</h3>
+            <div class="sound-grid">
+                <button class="sound-btn" data-sound="rain">🌧️ Rain</button>
+                <button class="sound-btn" data-sound="forest">🌲 Forest</button>
+                <button class="sound-btn" data-sound="lofi">🎵 Lo-fi</button>
+                <button class="sound-btn" data-sound="winter_winds">⚪ Winter Winds</button>
+            </div>
+            <button class="action-btn" id="playBtn" disabled>▶ Play Selected Sound</button>
         </div>
 
-        <!-- Distraction Blocker -->
-        <h3 style="margin:40px 0 20px;">Distraction Blocker Checklist</h3>
-        <ul class="distraction-list">
-            <li>✅ Phone on Do Not Disturb</li>
-            <li>✅ Desk cleared</li>
-            <li>✅ Browser tabs closed (except this)</li>
-            <li>✅ Water nearby</li>
-            <li>✅ Noise-canceling headphones on</li>
-        </ul>
-
-        <!-- Log Session -->
-        <div style="text-align:center; margin:60px 0;">
-            <button class="btn btn-primary" id="logSessionBtn" style="padding:16px 48px; font-size:1.2rem;">
+        <!-- 7. Log Session -->
+        <div class="log-section">
+            <button class="action-btn" id="logSessionBtn">
                 ✅ Log This Session (Save Progress)
             </button>
+            <p id="sessionSummary" class="session-summary"></p>
         </div>
     </div>
 
+    <audio id="soundPlayer" loop preload="auto"></audio>
+
     <script>
+        // ── Variables ────────────────────────────────────────────────────────
+        const envSelect              = document.getElementById('environment');
+        const checklistSection       = document.getElementById('checklistSection');
+        const checklistItems         = document.getElementById('checklistItems');
+        const playBtn                = document.getElementById('playBtn');
+        const logBtn                 = document.getElementById('logSessionBtn');
+        const startBreathingBtn      = document.getElementById('startBreathingBtn');
+        const breathingCircle        = document.getElementById('breathingCircle');
+        const breathingInstruction   = document.getElementById('breathingInstruction');
+        const soundPlayer            = document.getElementById('soundPlayer');
+        const quickClearBtn          = document.getElementById('quickClearBtn');
+        const quickResult            = document.getElementById('quickResult');
+        const quickInstruction       = document.getElementById('quickInstruction');
+        const intentionInput         = document.getElementById('intentionInput');
+        const saveIntentionBtn       = document.getElementById('saveIntentionBtn');
+
+        // Checklist definitions
+        const checklists = {
+            office: [
+                "Phone on silent / Do Not Disturb",
+                "Desk cleared of unrelated items",
+                "Browser tabs closed (except this)",
+                "Door closed or headphones on",
+                "Notifications turned off"
+            ],
+            "home-quiet": [
+                "Phone on silent",
+                "Quiet room selected",
+                "Family/friends know you're focusing",
+                "Water bottle nearby",
+                "Comfortable chair and posture"
+            ],
+            "home-noisy": [
+                "Noise-canceling headphones on",
+                "Door closed",
+                "Tell family/roommates you're focusing for 25 min",
+                "Use winter winds sound or lo-fi to mask sound",
+                "Sit in quietest corner"
+            ],
+            public: [
+                "Headphones or earplugs in",
+                "Find quietest corner/table",
+                "Phone on silent/vibrate",
+                "Screen brightness low",
+                "Focus on breathing to block noise"
+            ],
+            alone: [
+                "Phone on Do Not Disturb",
+                "Comfortable lighting",
+                "Water nearby",
+                "Desk tidy",
+                "Good posture – sit upright"
+            ],
+            "with-people": [
+                "Noise-canceling headphones",
+                "Tell others you're focusing (e.g. 25 min)",
+                "Find a separate room if possible",
+                "Use lo-fi or winter Winds",
+                "Gentle reminder sign if needed"
+            ],
+            outdoors: [
+                "Find a calm spot (bench, park)",
+                "Phone on silent",
+                "Comfortable position",
+                "Focus on natural sounds",
+                "Bring water"
+            ]
+        };
+
+        // ── Quick Mind Clear ────────────────────────────────────────────────
+        quickClearBtn.addEventListener('click', () => {
+            quickClearBtn.style.display = 'none';
+            quickResult.style.display = 'block';
+            quickInstruction.textContent = "Breathe fast and shallow 10 times... (do it now!)";
+            
+            let count = 10;
+            const interval = setInterval(() => {
+                count--;
+                quickInstruction.textContent = `Fast breaths left: ${count}`;
+                if (count <= 0) {
+                    clearInterval(interval);
+                    quickInstruction.textContent = "Done! Now set one clear intention for the next 25 minutes.";
+                    intentionInput.style.display = 'block';
+                    saveIntentionBtn.style.display = 'block';
+                }
+            }, 1000);
+        });
+
+        saveIntentionBtn.addEventListener('click', () => {
+            const intention = intentionInput.value.trim();
+            if (intention) {
+                alert(`Intention saved: "${intention}"\n\nGreat — now go crush it!`);
+                quickResult.style.display = 'none';
+                quickClearBtn.style.display = 'block';
+                quickClearBtn.textContent = "Quick Mind Clear (Done)";
+                quickClearBtn.disabled = true;
+            } else {
+                alert("Please write your intention before saving.");
+            }
+        });
+
+        // ── Environment → Checklist (only for ambient sounds) ───────────────
+        envSelect.addEventListener('change', () => {
+            const env = envSelect.value;
+            if (!env) {
+                checklistSection.style.display = 'none';
+                playBtn.disabled = true;
+                return;
+            }
+
+            checklistSection.style.display = 'block';
+            checklistItems.innerHTML = '';
+
+            checklists[env].forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'checklist-item';
+                li.innerHTML = `
+                    <input type="checkbox" id="cb-${item.replace(/\s+/g, '-').toLowerCase()}">
+                    <label for="cb-${item.replace(/\s+/g, '-').toLowerCase()}">${item}</label>
+                `;
+                checklistItems.appendChild(li);
+            });
+
+            // Reset play button
+            playBtn.disabled = true;
+
+            const checkboxes = checklistItems.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.addEventListener('change', checkCompletion));
+
+            function checkCompletion() {
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                playBtn.disabled = !allChecked;
+            }
+        });
+
+        // ── Pomodoro Timer ──────────────────────────────────────────────────
         let timerInterval;
-        let timeLeft = 1500; // default 25 min
+        let timeLeft = 25 * 60;
+        let initialTime = timeLeft;
         let isRunning = false;
 
         const timerEl = document.getElementById('timer');
-        const startBtn = document.getElementById('startBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const logBtn = document.getElementById('logSessionBtn');
+        const progressRing = document.getElementById('progressRing');
+        const startTimerBtn = document.getElementById('startTimerBtn');
+        const pauseTimerBtn = document.getElementById('pauseTimerBtn');
+        const resetTimerBtn = document.getElementById('resetTimerBtn');
+
+        const circumference = 2 * Math.PI * 54;
+        progressRing.style.strokeDasharray = circumference;
 
         function updateTimerDisplay() {
             const min = Math.floor(timeLeft / 60);
             const sec = timeLeft % 60;
             timerEl.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+
+            const progress = (initialTime - timeLeft) / initialTime;
+            const offset = circumference * (1 - progress);
+            progressRing.style.strokeDashoffset = offset;
+
+            if (timeLeft < 60) {
+                timerEl.classList.add('low-time');
+            } else {
+                timerEl.classList.remove('low-time');
+            }
         }
 
         function startTimer() {
             if (isRunning) return;
             isRunning = true;
-            startBtn.style.display = 'none';
-            pauseBtn.style.display = 'inline-block';
-            
+            startTimerBtn.style.display = 'none';
+            pauseTimerBtn.style.display = 'inline-block';
+            initialTime = timeLeft;
+
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    alert("🎉 Focus session complete! Great work!");
                     isRunning = false;
-                    pauseBtn.style.display = 'none';
-                    startBtn.style.display = 'inline-block';
+                    alert("🎉 Focus session complete!");
+                    pauseTimerBtn.style.display = 'none';
+                    startTimerBtn.style.display = 'inline-block';
                 }
             }, 1000);
         }
@@ -119,56 +294,123 @@
         function pauseTimer() {
             clearInterval(timerInterval);
             isRunning = false;
-            pauseBtn.style.display = 'none';
-            startBtn.style.display = 'inline-block';
+            pauseTimerBtn.style.display = 'none';
+            startTimerBtn.style.display = 'inline-block';
         }
 
         function resetTimer() {
             clearInterval(timerInterval);
             isRunning = false;
-            timeLeft = parseInt(document.getElementById('durationSelect').value) || 1500;
+            timeLeft = 25 * 60;
+            initialTime = timeLeft;
             updateTimerDisplay();
-            startBtn.style.display = 'inline-block';
-            pauseBtn.style.display = 'none';
+            startTimerBtn.style.display = 'inline-block';
+            pauseTimerBtn.style.display = 'none';
         }
 
-        startBtn.addEventListener('click', startTimer);
-        pauseBtn.addEventListener('click', pauseTimer);
-        resetBtn.addEventListener('click', resetTimer);
-
-        document.getElementById('durationSelect').addEventListener('change', (e) => {
-            if (e.target.value === 'custom') {
-                timeLeft = parseInt(prompt("Enter duration in seconds:", "1500")) || 1500;
-            } else {
-                timeLeft = parseInt(e.target.value);
-            }
-            updateTimerDisplay();
-        });
-
-        // Log session (calls your WorkoutSessionViewSet)
-        logBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch('/api/workouts/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer YOUR_JWT_TOKEN_HERE'  // replace with real token
-                    },
-                    body: JSON.stringify({
-                        session_type: 'focus_reset',
-                        duration_seconds: 1500 - timeLeft,
-                        notes: 'Focus Reset session completed'
-                    })
-                });
-                if (response.ok) {
-                    alert('✅ Session logged successfully!');
-                }
-            } catch(e) {
-                alert('Session saved locally (API not connected yet)');
-            }
-        });
+        startTimerBtn.addEventListener('click', startTimer);
+        pauseTimerBtn.addEventListener('click', pauseTimer);
+        resetTimerBtn.addEventListener('click', resetTimer);
 
         updateTimerDisplay();
+
+        // ── Breathing Animation (6-3-6) – always available ──────────────────
+        let breathingInterval;
+
+        function startBreathing() {
+            let phase = 0; // 0=in, 1=hold, 2=out
+            breathingInstruction.textContent = 'Breathe in for 6 seconds…';
+            breathingCircle.style.animation = 'breathe-in 6s ease-in-out forwards';
+
+            breathingInterval = setInterval(() => {
+                phase = (phase + 1) % 3;
+                if (phase === 0) {
+                    breathingInstruction.textContent = 'Breathe in for 6 seconds…';
+                    breathingCircle.style.animation = 'breathe-in 6s ease-in-out forwards';
+                } else if (phase === 1) {
+                    breathingInstruction.textContent = 'Hold for 3 seconds…';
+                    breathingCircle.style.animation = 'hold 3s linear forwards';
+                } else {
+                    breathingInstruction.textContent = 'Breathe out for 6 seconds…';
+                    breathingCircle.style.animation = 'breathe-out 6s ease-in-out forwards';
+                }
+            }, 6000);
+        }
+
+        startBreathingBtn.addEventListener('click', () => {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+                breathingCircle.style.animation = '';
+                breathingInstruction.textContent = 'Breathing paused – click to restart';
+                startBreathingBtn.textContent = 'Start Breathing Exercise';
+            } else {
+                startBreathing();
+                startBreathingBtn.textContent = 'Stop Breathing Exercise';
+            }
+        });
+
+        // ── Ambient Sounds – REAL MUSIC PLAYBACK (your filenames) ────────────
+        const soundBtns = document.querySelectorAll('.sound-btn');
+
+        // CHANGE THESE LINES TO MATCH YOUR ACTUAL FILENAMES
+        const soundFiles = {
+            rain:    "{% static 'api/music/rainy.mp3' %}",       // ← replace with real name
+            forest:  "{% static 'api/music/jungle.mp3' %}",     // ← replace
+            lofi:    "{% static 'api/music/spring_birds.mp3' %}",       // ← replace
+            winter_winds:   "{% static 'api/music/winter_winds.mp3' %}" // ← replace
+        };
+
+        // When user clicks Rain / Forest / Lo-fi / Winter Winds
+        soundBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Highlight selected button
+                soundBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Stop any currently playing sound
+                soundPlayer.pause();
+                playBtn.textContent = '▶ Play Selected Sound';
+            });
+        });
+
+        // Play / Pause button – plays the selected sound file
+        playBtn.addEventListener('click', () => {
+            const activeBtn = document.querySelector('.sound-btn.active');
+
+            if (!activeBtn) {
+                alert("Please select a sound first (Rain, Forest, Lo-fi, or Winter Winds).");
+                return;
+            }
+
+            const soundKey = activeBtn.dataset.sound;
+            const soundUrl = soundFiles[soundKey];
+
+            if (!soundUrl) {
+                alert("Sound file mapping not found – check soundFiles object.");
+                return;
+            }
+
+            if (soundPlayer.src !== soundUrl || soundPlayer.paused) {
+                // Load and play the sound
+                soundPlayer.src = soundUrl;
+                soundPlayer.play().catch(err => {
+                    console.error("Audio playback failed:", err);
+                    alert("Cannot play audio. Check file name/path or browser permissions.");
+                });
+                playBtn.textContent = '⏸ Pause Sound';
+            } else {
+                // Pause if already playing
+                soundPlayer.pause();
+                playBtn.textContent = '▶ Play Selected Sound';
+            }
+        });
+
+        // ── Log Session ──────────────────────────────────────────────────────
+        logBtn.addEventListener('click', async () => {
+            alert("Session logged! Great focus work.");
+            // Later: send to backend /api/workouts/
+        });
     </script>
 </body>
 </html>
