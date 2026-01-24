@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ease Anxiety | MindForge</title>
+  <link rel="stylesheet" href="{% static 'api/css/anxietystyles.css' %}" />
+</head>
+<body>
+
+  <div class="container">
+
+    <a href="/" class="back">← Back to Dashboard</a>
+
+    <div class="header">
+      <h1>Ease Anxiety 🌿</h1>
+      <p>A gentle space to slow your mind.</p>
+    </div>
+
+    <!-- Mood Card -->
+    <div class="card">
+      <h3>How are you feeling right now?</h3>
+      <div class="moods">
+        <button class="mood active" data-mood="calm">😌 Calm</button>
+        <button class="mood" data-mood="uneasy">😟 Uneasy</button>
+        <button class="mood" data-mood="overwhelmed">😣 Overwhelmed</button>
+        <button class="mood" data-mood="panic">😵 Panic</button>
+      </div>
+    </div>
+
+    <!-- Support Card -->
+    <div class="card" id="support-card">
+      <h3 id="dynamic-title">Glad you’re feeling okay.</h3>
+      <p class="muted" id="dynamic-subtitle">Want to maintain this calm?</p>
+
+      <div class="actions" id="dynamic-actions">
+        <!-- Buttons injected by JS -->
+      </div>
+    </div>
+
+    <!-- NEW: Activity Area (Hidden by default) -->
+    <div id="activity-area" class="card" style="display: none; position: relative;">
+        <button id="close-activity" class="close-btn">✕</button>
+        <div id="activity-content">
+            <!-- Dynamic content goes here -->
+        </div>
+    </div>
+
+    <!-- Safe Person -->
+     <div class="card" id="safe-person-card">
+      <h3 id="sp-card-title">Need a human instead?</h3>
+      <p class="muted" id="sp-card-subtitle">Sometimes the best support is someone who knows you.</p>
+      
+      <button id="btn-contact-human" class="primary">📲 Text my safe person</button>
+      
+      <!-- Hidden panic resource button (shown via JS later if needed) -->
+      <button id="btn-panic-resources" class="primary" style="display:none; background:#ef4444; color:white; margin-left:10px;">Show Resources</button>
+    </div>
+    <p class="footer">
+      Anxiety is your nervous system trying to protect you, not harm you.
+    </p>
+
+  </div>
+
+  <!-- SETUP MODAL (Hidden by default) -->
+  <div id="setup-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>Choose your safe person 🛡️</h3>
+        <p class="muted">Who can you trust to just "be there"?</p>
+        
+        <input type="text" id="sp-name" placeholder="Name (e.g., Sarah)" />
+        <input type="tel" id="sp-phone" placeholder="Phone Number" />
+        
+        <div class="checkbox-wrapper">
+            <input type="checkbox" id="sp-default-msg" checked>
+            <label for="sp-default-msg">Use default message?</label>
+        </div>
+        <p class="small-text" style="color:#64748b; font-size:0.9rem; margin-top:-5px;">"Hey, I’m not feeling okay right now. Could you check in on me?"</p>
+
+        <div class="modal-actions">
+            <button id="btn-save-sp" class="primary">Save Safe Person</button>
+            <button id="btn-cancel-sp" class="secondary">Cancel</button>
+        </div>
+    </div>
+    </div>
+
+    
+
+  <script src="{% static 'api/js/anxietyscripts.js' %}"></script>
+</body>
+</html>

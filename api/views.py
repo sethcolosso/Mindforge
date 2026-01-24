@@ -116,3 +116,6 @@ def focus_reset_view(request):
         'default_duration': 25 * 60,  # 25 minutes in seconds
     }
     return render(request, 'api/exercises/focus_reset.html', context)
+
+def ease_anxiety_view(request):
+    return render(request, 'api/exercises/ease_anxiety.html')

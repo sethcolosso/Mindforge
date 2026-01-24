@@ -11,7 +11,8 @@ from .views import (
     WorkoutSessionViewSet,
     BadgeViewSet,
     CoachRecommendationView,
-    focus_reset_view,   # ← added here
+    focus_reset_view, 
+    ease_anxiety_view,  # ← added here
 )
 
 router = DefaultRouter()
@@ -38,4 +39,7 @@ urlpatterns = [
 
     # Focus Reset page
     path('exercises/focus-reset/', focus_reset_view, name='focus_reset'),
+
+    # Ease Anxiety page
+    path('exercises/ease-anxiety/', ease_anxiety_view, name='ease_anxiety'),
 ]
