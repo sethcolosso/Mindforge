@@ -4,12 +4,49 @@ from django.utils import timezone
 
 
 class Profile(models.Model):
+    """
+    User profile with account type (regular user or mental health professional)
+    """
+    ACCOUNT_TYPE_CHOICES = [
+        ('user', 'Regular User'),
+        ('work', 'Mental Health Professional'),
+    ]
+
+    CAREER_TYPE_CHOICES = [
+        ('physician', 'Physician'),
+        ('psychiatrist', 'Psychiatrist'),
+        ('therapist', 'Therapist'),
+        ('counselor', 'Counselor'),
+        ('psychologist', 'Psychologist'),
+        ('social_worker', 'Social Worker'),
+        # You can add more professions later
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    bio = models.TextField(blank=True)
+    
+    # Account type & career (for professionals)
+    account_type = models.CharField(
+        max_length=10,
+        choices=ACCOUNT_TYPE_CHOICES,
+        default='user'
+    )
+    career_type = models.CharField(
+        max_length=20,
+        choices=CAREER_TYPE_CHOICES,
+        blank=True,
+        null=True  # Only required for work accounts
+    )
+
+    # Common fields
+    bio = models.TextField(blank=True, null=True)
     goals = models.JSONField(default=list, blank=True)
 
+    # Work account specific fields
+    profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    is_visible_for_search = models.BooleanField(default=False)
+
     def __str__(self):
-        return f"Profile({self.user.username})"
+        return f"{self.user.username}'s Profile ({self.account_type})"
 
 
 class MoodEntry(models.Model):

@@ -11,8 +11,10 @@ from .views import (
     WorkoutSessionViewSet,
     BadgeViewSet,
     CoachRecommendationView,
-    focus_reset_view, 
-    ease_anxiety_view,  # ← added here
+    ProfessionalSearchView,
+    current_user,
+    focus_reset_view,
+    ease_anxiety_view,
 )
 
 router = DefaultRouter()
@@ -23,23 +25,23 @@ router.register(r'workouts', WorkoutSessionViewSet, basename='workout')
 router.register(r'badges', BadgeViewSet, basename='badge')
 
 urlpatterns = [
-    # Authentication endpoints (public)
-    path('auth/register/', RegisterView.as_view(), name='auth-register'),
-    path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # Authentication endpoints
+    path('api/auth/register/', RegisterView.as_view(), name='auth-register'),
+    path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/me/', current_user, name='current_user'),
 
-    # Coach recommendation
-    path('coach/recommendation/', CoachRecommendationView.as_view(), name='coach-recommendation'),
+    # Professional Search
+    path('api/professionals/search/', ProfessionalSearchView.as_view(), name='professional-search'),
 
-    # All API endpoints under /api/
+    # Coach Recommendation
+    path('api/coach/recommendation/', CoachRecommendationView.as_view(), name='coach-recommendation'),
+
+    # All ViewSet APIs
     path('api/', include(router.urls)),
 
-    # IMPORTANT: The actual web page (your MindForge UI) served at ROOT
+    # HTML Pages
     path('', home, name='home'),
-
-    # Focus Reset page
     path('exercises/focus-reset/', focus_reset_view, name='focus_reset'),
-
-    # Ease Anxiety page
     path('exercises/ease-anxiety/', ease_anxiety_view, name='ease_anxiety'),
 ]
