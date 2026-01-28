@@ -1,3 +1,4 @@
+from urllib import request
 from django.contrib.auth.models import User
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -119,3 +120,9 @@ def focus_reset_view(request):
 
 def ease_anxiety_view(request):
     return render(request, 'api/exercises/ease_anxiety.html')
+
+def visualization_view(request):
+    return render(request, 'api/exercises/visualization.html')
+
+def visualization_player_view(request):
+    return render(request, 'api/exercises/player.html')

@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindForge | Session Active</title>
+    <link rel="stylesheet" href="{% static 'api/css/playerstyles.css' %}" />
+</head>
+<body>
+    <div class="video-container">
+        <video autoplay muted loop id="bg-video">
+            <source src="forest-visual.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-vignette"></div>
+    </div>
+
+    <div class="player-content">
+        <div class="breathing-circle-wrapper">
+            <div id="breathing-circle"></div>
+            <p id="breath-instruction">Inhale...</p>
+        </div>
+
+        <div class="session-timer" id="timer">15:00</div>
+        
+        <button class="exit-btn" onclick="window.location.href='/exercises/visualization/'">✕ End Session</button>
+    <script src="{% static 'api/js/playerscripts.js' %}"></script>
+</body>
+</html>

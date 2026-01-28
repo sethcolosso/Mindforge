@@ -63,23 +63,28 @@ body {
 
 .mood, .action {
   background: #0f172a;
-  border: 1px solid #1f2937;
-  padding: 12px 22px;
-  border-radius: 999px;
+  border: 1px solid #374151;
+  padding: 14px 28px;
+  border-radius: 12px;
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
 .mood:hover, .action:hover {
   transform: translateY(-2px);
   border-color: #2dd4bf;
+  background: #1f2937;
 }
 
 .mood.active {
   background: #14b8a6;
   color: #022c22;
   font-weight: 600;
+  border-color: #14b8a6;
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.3);
 }
 
 .primary {
@@ -87,16 +92,19 @@ body {
   color: #022c22;
   border: none;
   padding: 16px 40px;
-  border-radius: 14px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   margin-top: 10px;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
 }
 
 .primary:hover {
+  background: #0f766e;
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.3);
 }
 
 .footer {
@@ -225,3 +233,85 @@ textarea, input[type="text"] {
   margin: 15px 0 10px;
   font-size: 1rem;
 }
+
+.pill-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.pill {
+  background: #0f172a;
+  border: 1px solid #374151;
+  padding: 14px 28px;
+  border-radius: 12px;  /* Changed from 999px to match mood buttons */
+  font-size: 1.1rem;     /* Increased from 14.5px */
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.pill:hover {
+  border-color: #2dd4bf;
+  transform: translateY(-2px);
+  background: #1f2937;
+  box-shadow: 0 4px 8px rgba(45, 212, 191, 0.15);
+}
+
+.pill.active {
+  background: #14b8a6;
+  color: #022c22;
+  border-color: #14b8a6;
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(20, 184, 166, 0.3);
+}
+
+.rescue-box {
+  margin-top: 25px;
+  color: #cbd5e1;
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.small {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* ...existing code... */
+
+/* Trigger Insight Card Animation */
+#trigger-insight-card {
+  animation: slideInUp 0.4s ease-out;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced pill button active state for triggers */
+.pill[data-trigger].active {
+  background: #14b8a6;
+  color: #022c22;
+  border-color: #14b8a6;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
+  transform: scale(1.05);
+}
+
+/* ...existing code... */

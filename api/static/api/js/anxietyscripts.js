@@ -49,6 +49,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const activityContent = document.getElementById('activity-content');
     const closeActivityBtn = document.getElementById('close-activity');
 
+    // DOM Elements for Trigger Insight
+const triggerButtons = document.querySelectorAll("[data-trigger]");
+const triggerInsightCard = document.getElementById("trigger-insight-card");
+const triggerInsightTitle = document.getElementById("trigger-insight-title");
+const triggerInsightSubtitle = document.getElementById("trigger-insight-subtitle");
+const triggerActionsContainer = document.getElementById("trigger-actions");
+const triggerFeedback = document.getElementById("triggerFeedback");
+
+
     // ─── 3. MOOD SELECTION LOGIC ──────────────────────────────────────
     moodButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -279,3 +288,144 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Hook into Panic Button (Optional Integration)
     // Modify your existing renderTool switch case for 'panic_mode' to elevate the card
 });
+
+// Trigger feedback
+document.querySelectorAll(".pill").forEach(btn => {
+  if (!btn.dataset.rescue) {
+    btn.addEventListener("click", () => {
+      document.getElementById("triggerFeedback").innerText =
+        `Noted. We'll gently keep this in mind 💛`;
+    });
+  }
+});
+
+// One-minute rescues logic
+const rescueMap = {
+  exhale: "Inhale gently… now make your exhale slightly longer. Repeat this 3 times.",
+  cold: "Run cool water over your wrists or hold something cold. It signals safety to your body.",
+  feet: "Press your feet into the floor. Feel the support beneath you.",
+  jaw: "Let your teeth part slightly. Relax your tongue. Let your jaw soften.",
+  name: "Look around and name five things you can see. Slowly."
+};
+
+document.querySelectorAll("[data-rescue]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("[data-rescue]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const key = btn.dataset.rescue;
+    document.getElementById("rescueOutput").innerText = rescueMap[key];
+  });
+});
+
+// ...existing code...
+
+// ─── TRIGGER DISCOVERY WITH EMOTIONAL INTELLIGENCE ─────────────────────
+
+const triggerInsights = {
+    work: {
+        title: "That makes sense. Work pressure can quietly build up.",
+        subtitle: "Want something gentle or something practical right now?",
+        actions: [
+            { text: "🫁 Calm my body", tool: "breathing" },
+            { text: "🧠 Help me think clearly", tool: "reframe" },
+            { text: "✍️ Process this feeling", tool: "vent" }
+        ]
+    },
+    relationships: {
+        title: "Connection stuff hits deep. You're not weird for feeling this way.",
+        subtitle: "What feels hardest right now?",
+        actions: [
+            { text: "😔 Feeling misunderstood", tool: "reframe" },
+            { text: "😰 Fear of conflict", tool: "reassurance" },
+            { text: "😞 Feeling alone", tool: "safe_person" }
+        ]
+    },
+    overthinking: {
+        title: "Your mind might be trying to protect you by thinking through everything.",
+        subtitle: "Let's slow it down together.",
+        actions: [
+            { text: "🫁 Calm my body first", tool: "breathing" },
+            { text: "✍️ Get thoughts out of my head", tool: "vent" },
+            { text: "🔁 Break looping thoughts", tool: "reframe" }
+        ]
+    },
+    "social-media": {
+        title: "Comparison is the thief of joy — and social media knows it.",
+        subtitle: "Let's ground you back in your own reality.",
+        actions: [
+            { text: "🌱 Ground me now", tool: "grounding" },
+            { text: "💭 Challenge my thoughts", tool: "reframe" },
+            { text: "🙏 Gratitude reset", tool: "gratitude" }
+        ]
+    },
+    money: {
+        title: "Financial stress touches our sense of safety.",
+        subtitle: "It's okay to feel this way. What would help?",
+        actions: [
+            { text: "🫁 Calm my nervous system", tool: "breathing" },
+            { text: "💭 Reframe my thoughts", tool: "reframe" },
+            { text: "✍️ Write it out", tool: "vent" }
+        ]
+    },
+    sleep: {
+        title: "Poor sleep affects everything — body, mood, thoughts.",
+        subtitle: "Let's help your nervous system feel safe enough to rest.",
+        actions: [
+            { text: "🫁 Breathing for sleep", tool: "breathing" },
+            { text: "🌱 Body scan grounding", tool: "grounding" },
+            { text: "📝 Brain dump before bed", tool: "vent" }
+        ]
+    },
+    "not-sure": {
+        title: "That's completely okay. Sometimes we just feel off.",
+        subtitle: "Let's explore gently — no pressure.",
+        actions: [
+            { text: "🌱 Ground in my body", tool: "grounding" },
+            { text: "✍️ Free write", tool: "vent" },
+            { text: "🫁 Just breathe", tool: "breathing" }
+        ]
+    }
+};
+
+
+// Handle Trigger Click
+triggerButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        // Visual feedback
+        triggerButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const triggerKey = btn.dataset.trigger;
+        const insight = triggerInsights[triggerKey];
+
+        if (insight) {
+            // Update insight card
+            triggerInsightTitle.textContent = insight.title;
+            triggerInsightSubtitle.textContent = insight.subtitle;
+            triggerActionsContainer.innerHTML = "";
+
+            // Add action buttons
+            insight.actions.forEach(action => {
+                const actionBtn = document.createElement("button");
+                actionBtn.className = "pill";
+                actionBtn.textContent = action.text;
+                actionBtn.addEventListener("click", () => {
+                    renderTool(action.tool);
+                    // Scroll to activity area smoothly
+                    activityArea.scrollIntoView({ behavior: "smooth", block: "center" });
+                });
+                triggerActionsContainer.appendChild(actionBtn);
+            });
+
+            // Show the insight card with fade-in
+            triggerInsightCard.style.display = "block";
+            triggerInsightCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            
+            // Update feedback
+            triggerFeedback.textContent = "Noted 💛 — We'll keep this in mind.";
+        }
+    });
+});
+
+// ...existing code (renderTool function, etc.)...

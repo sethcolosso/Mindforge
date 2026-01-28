@@ -12,7 +12,9 @@ from .views import (
     BadgeViewSet,
     CoachRecommendationView,
     focus_reset_view, 
-    ease_anxiety_view,  # ← added here
+    ease_anxiety_view,
+        visualization_view,
+            visualization_player_view,  # ← added here
 )
 
 router = DefaultRouter()
@@ -42,4 +44,10 @@ urlpatterns = [
 
     # Ease Anxiety page
     path('exercises/ease-anxiety/', ease_anxiety_view, name='ease_anxiety'),
+
+    # Visualization page
+    path('exercises/visualization/', visualization_view, name='visualization'),
+
+     # Visualization Player Page (The new route)
+    path('exercises/visualization/player/', visualization_player_view, name='visualization_player'),
 ]

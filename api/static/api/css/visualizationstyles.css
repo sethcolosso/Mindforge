@@ -1,0 +1,284 @@
+:root {
+    --bg-dark: #0b0f19;
+    --card-bg: #161b2a;
+    --accent-teal: #00d1b2;
+    --text-main: #ffffff;
+    --text-dim: #94a3b8;
+    --glass: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.minimal-nav {
+    width: 100%;
+    max-width: 1000px; /* Aligns with the content width */
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.back-link {
+    color: var(--accent-teal);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.back-link:hover { opacity: 0.7; }
+
+.centered-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    text-align: center;
+}
+
+.header { margin-bottom: 40px; }
+.highlight { color: var(--accent-teal); }
+.subtitle { color: var(--text-dim); }
+
+/* Main Section */
+.journey-grid {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 24px;
+    margin-bottom: 30px;
+    text-align: left; /* Keep card titles left-aligned */
+}
+
+.cards-container {
+    display: grid;
+    /* This creates a grid that automatically adjusts columns based on width */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Base Card Styling */
+.journey-card {
+    background: #1e2536;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+/* Hover Effects */
+.journey-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-teal);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    transition: transform 0.5s ease;
+}
+
+/* Zoom effect on image when hovering card */
+.journey-card:hover .card-image {
+    transform: scale(1.1);
+}
+
+/* Play Button Overlay (Hidden by default) */
+.play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.play-overlay span {
+    font-size: 3rem;
+    color: var(--accent-teal);
+}
+
+.journey-card:hover .play-overlay {
+    opacity: 1;
+}
+
+/* Card Info Labels */
+.card-info {
+    padding: 20px;
+    background: #1e2536; /* Ensures info background stays solid over the zoom */
+    position: relative;
+    z-index: 2;
+}
+
+.card-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.card-info p {
+    margin: 5px 0 0;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
+/* Responsive Tweaks for Mobile */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    .journey-card {
+        margin-bottom: 10px;
+    }
+}
+
+
+/* Image Assets */
+.forest { background-image: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400'); }
+.ocean { background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400'); }
+.cosmic { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400'); }
+
+.card-info { padding: 15px; }
+.card-info h3 { font-size: 1rem; margin: 0; }
+.card-info p { color: var(--text-dim); font-size: 0.85rem; }
+
+/* Settings Section */
+.settings-container {
+    display: flex;
+    justify-content: center;
+}
+
+.customization {
+    background: var(--card-bg);
+    padding: 35px;
+    border-radius: 28px;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    border: 1px solid rgba(0, 209, 178, 0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+
+.controls-row .control-group { flex: 1; }
+
+/* Voice Selector Buttons */
+.voice-selector {
+    display: flex;
+    background: #0b0f19;
+    padding: 6px;
+    border-radius: 12px;
+    gap: 5px;
+}
+
+.voice-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.voice-btn.active {
+    background: var(--accent-teal);
+    color: #0b0f19;
+    box-shadow: 0 4px 10px rgba(0, 209, 178, 0.3);
+}
+
+/* Custom Slider Styling */
+.slider-group {
+    margin-bottom: 35px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+#duration-display {
+    color: var(--accent-teal);
+    font-weight: bold;
+}
+
+.custom-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #2d3748;
+    border-radius: 10px;
+    outline: none;
+}
+
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid #0b0f19;
+    box-shadow: 0 0 10px rgba(0, 209, 178, 0.5);
+}
+
+/* Hero Button with Glow */
+.btn-primary-glow {
+    width: 100%;
+    background: var(--accent-teal);
+    color: #0b0f19;
+    border: none;
+    padding: 18px;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 209, 178, 0.2);
+}
+
+.btn-primary-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(0, 209, 178, 0.4);
+    filter: brightness(1.1);
+}
+
+/* Responsive adjustment */
+@media (max-width: 650px) {
+    .controls-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* New Image Assets for Row 2 */
+.city { background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=500'); }
+.mountain { background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500'); }
+.zen { background-image: url('https://images.unsplash.com/photo-1558449132-95995807156e?w=500'); }

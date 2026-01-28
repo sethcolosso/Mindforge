@@ -47,6 +47,50 @@
         </div>
     </div>
 
+    <!-- Trigger Discovery Card -->
+    <div class="card">
+      <h3>Do you know what might have triggered this?</h3>
+      <p class="muted">Only if you feel comfortable sharing.</p>
+
+      <div class="pill-group">
+        <button class="pill" data-trigger="work">💼 Work</button>
+        <button class="pill" data-trigger="relationships">🧑‍🤝‍🧑 Relationships</button>
+        <button class="pill" data-trigger="overthinking">🧠 Overthinking</button>
+        <button class="pill" data-trigger="social-media">📱 Social Media</button>
+        <button class="pill" data-trigger="money">💰 Money</button>
+        <button class="pill" data-trigger="sleep">💤 Sleep</button>
+        <button class="pill" data-trigger="not-sure">❓ Not sure</button>
+      </div>
+
+      <p id="triggerFeedback" class="muted small"></p>
+    </div>
+
+    <!-- NEW: Dynamic Trigger Insight Card (Hidden by default) -->
+    <div id="trigger-insight-card" class="card" style="display: none;">
+      <h3 id="trigger-insight-title"></h3>
+      <p class="muted" id="trigger-insight-subtitle"></p>
+
+      <div class="pill-group" id="trigger-actions">
+        <!-- Action buttons injected by JS -->
+      </div>
+    </div>
+    
+    <!-- One-Minute Rescues Card -->
+    <div class="card">
+      <h3>One-Minute Rescues</h3>
+      <p class="muted">Small actions that help your body feel safe.</p>
+
+      <div class="pill-group">
+        <button class="pill" data-rescue="exhale">🫁 Slow your exhale</button>
+        <button class="pill" data-rescue="cold">🧊 Cold water reset</button>
+        <button class="pill" data-rescue="feet">🦶 Feel your feet</button>
+        <button class="pill" data-rescue="jaw">🫳 Unclench your jaw</button>
+        <button class="pill" data-rescue="name">👁 Name 5 things</button>
+      </div>
+
+      <div id="rescueOutput" class="rescue-box"></div>
+    </div>
+    
     <!-- Safe Person -->
      <div class="card" id="safe-person-card">
       <h3 id="sp-card-title">Need a human instead?</h3>
@@ -84,6 +128,7 @@
         </div>
     </div>
     </div>
+    
 
     
 

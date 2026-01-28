@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindForge | Visualization</title>
+    <link rel="stylesheet" href="{% static 'api/css/visualizationstyles.css' %}" />
+</head>
+<body>
+    <nav class="minimal-nav">
+        <a href="/" class="back-link">← Back to Dashboard</a>
+    </nav>
+
+    <div class="centered-wrapper">
+        <header class="header">
+            <h1>Visualization: <span class="highlight">Guided Journeys for a Calm Mind</span></h1>
+            <p class="subtitle">Explore serene landscapes, achieve inner peace</p>
+        </header>
+
+        <section class="journey-grid">
+    <h2 class="section-title">Recommended Journeys</h2>
+    <div class="cards-container">
+        <div class="journey-card">
+            <div class="card-image forest">
+                <div class="play-overlay"><span>▶</span></div>
+            </div>
+            <div class="card-info">
+                <h3>Forest Escape 😊</h3>
+                <p>Deep Relaxation</p>
+            </div>
+        </div>
+
+        <div class="journey-card">
+            <div class="card-image ocean">
+                <div class="play-overlay"><span>▶</span></div>
+            </div>
+            <div class="card-info">
+                <h3>Ocean Serenity 😊</h3>
+                <p>Stress Release</p>
+            </div>
+        </div>
+
+        <div class="journey-card">
+            <div class="card-image cosmic">
+                <div class="play-overlay"><span>▶</span></div>
+            </div>
+            <div class="card-info">
+                <h3>Cosmic Calm 😊</h3>
+                <p>Focus & Clarity</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="journey-grid">
+    <h2 class="section-title">Explore More Journeys</h2>
+    <div class="cards-container">
+        <div class="journey-card" data-theme="city">
+            <div class="card-image city">
+                <div class="play-overlay"><span>▶</span></div>
+            </div>
+            <div class="card-info">
+                <h3>City Rain 😊</h3>
+                <p>Urban Peace</p>
+            </div>
+        </div>
+
+        <div class="journey-card" data-theme="mountain">
+            <div class="card-image mountain">
+                <div class="play-overlay"><span>▶</span></div>
+            </div>
+            <div class="card-info">
+                <h3>Mountain Air 😊</h3>
+                <p>Heightened Focus</p>
+            </div>
+        </div>
+
+        <div class="journey-card" data-theme="zen">
+            <div class="card-image zen">
+                <div class="play-overlay"><span>▶</span></div>
+            </div>
+            <div class="card-info">
+                <h3>Zen Garden 😊</h3>
+                <p>Morning Mindfulness</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <section class="settings-container">
+    <div class="glass-panel customization">
+        <h3>Customize Your Session</h3>
+        
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="theme-select">Visualization Theme</label>
+                <div class="select-wrapper">
+                    <select id="theme-select">
+                        <option value="nature">Nature (Forest/Ocean)</option>
+                        <option value="cosmos">Cosmic (Stars/Galaxies)</option>
+                        <option value="city">Ambient City (Rain/Lights)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Background Voice</label>
+                <div class="voice-selector">
+                    <button class="voice-btn active" data-voice="male">Male</button>
+                    <button class="voice-btn" data-voice="female">Female</button>
+                    <button class="voice-btn" data-voice="none">None</button>
+                </div>
+            </div>
+        </div>
+        
+        <input type="range" min="5" max="30" value="15" class="custom-slider" id="duration-slider">
+<span id="duration-display">15 minutes</span>
+
+<div class="voice-selector">
+    <button class="voice-btn active">Male</button>
+    <button class="voice-btn">Female</button>
+    <button class="voice-btn">None</button>
+</div>
+
+        <button class="btn-primary-glow">Start Visualization</button>
+    </div>
+</section>
+<script src="{% static 'api/js/visualizationscripts.js' %}"></script>
+</body>
+</html>
