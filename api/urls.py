@@ -11,17 +11,12 @@ from .views import (
     WorkoutSessionViewSet,
     BadgeViewSet,
     CoachRecommendationView,
-<<<<<<< HEAD
-    focus_reset_view, 
-    ease_anxiety_view,
-        visualization_view,
-            visualization_player_view,  # ← added here
-=======
     ProfessionalSearchView,
     current_user,
     focus_reset_view,
     ease_anxiety_view,
->>>>>>> bba4e7e38ef14caee63553ada99eb74afcaf32dc
+    visualization_view,
+    visualization_player_view,
 )
 
 router = DefaultRouter()
