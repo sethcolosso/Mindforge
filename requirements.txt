@@ -3,3 +3,4 @@ djangorestframework>=3.14
 djangorestframework-simplejwt>=5.2
 python-dotenv>=1.0
 openai>=1.0.0
+Pillow
