@@ -8,6 +8,7 @@ Quick setup (Windows PowerShell):
 # create and activate venv
 python -m venv venv
 .\venv\Scripts\Activate
+django-cors-headers
 
 # install dependencies
 pip install -r requirements.txt

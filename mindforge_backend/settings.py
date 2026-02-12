@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from datetime import timedelta   # ← ADDED THIS LINE (required for SIMPLE_JWT)
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'please-set-a-secret-key')

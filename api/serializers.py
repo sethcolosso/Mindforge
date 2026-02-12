@@ -29,16 +29,22 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         account_type = validated_data.pop('account_type')
         career_type = validated_data.pop('career_type', None)
+        
+        # Create user
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password']
         )
-        Profile.objects.create(
+        
+        # Create profile - THIS IS CRITICAL
+        profile = Profile.objects.create(
             user=user,
             account_type=account_type,
             career_type=career_type if account_type == 'work' else None
         )
+        
+        print(f"DEBUG: Created user {user.username} with profile {profile.id}")  # Add this line
         return user
 
 
