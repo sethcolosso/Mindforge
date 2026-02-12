@@ -4,10 +4,29 @@ from .models import Profile, MoodEntry, Exercise, WorkoutSession, Badge
 
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_photo = serializers.ImageField(
+        source='profile.profile_photo',
+        read_only=True
+    )
+    account_type = serializers.CharField(
+        source='profile.account_type',
+        read_only=True
+    )
+    career_type = serializers.CharField(
+        source='profile.career_type',
+        read_only=True
+    )
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
-
+        fields = (
+            'id',
+            'username',
+            'email',
+            'profile_photo',
+            'account_type',
+            'career_type'
+        )
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
