@@ -408,9 +408,35 @@
 
         // ── Log Session ──────────────────────────────────────────────────────
         logBtn.addEventListener('click', async () => {
-            alert("Session logged! Great focus work.");
-            // Later: send to backend /api/workouts/
+    const token = getToken();
+    if (!token) {
+        alert("Please sign in to log sessions");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/exercises/1/complete/', {  // Assuming focus exercise ID = 1
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                duration_seconds: Math.floor(Math.random() * 300) + 300,  // 5-10 minutes
+                notes: 'Focus reset session completed'
+            })
         });
+        if (response.ok) {
+            const result = await response.json();
+            alert(result.message || "Session logged successfully!");
+        } else {
+            alert("Failed to log session");
+        }
+    } catch (error) {
+        console.error('Session logging failed:', error);
+        alert("Network error while logging session");
+    }
+});
     </script>
 </body>
 </html>

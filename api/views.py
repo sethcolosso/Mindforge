@@ -18,7 +18,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
 from django.shortcuts import render
 from .services.openai_service import get_coach_recommendation
-
+from .services.MoodService import MoodService
+from .services.ExerciseService import ExerciseService
+from .services.ProfileService import ProfileService
 
 def home(request):
     """
@@ -99,16 +101,94 @@ class MoodEntryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return MoodEntry.objects.filter(user=self.request.user)
+        # Delegate to Layer 1
+        return MoodService.get_user_moods(self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        # Layer 2: Validation and response formatting
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'status': 'error',
+                'message': 'Invalid data provided',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Delegate to Layer 1
+        mood_entry = MoodService.create_mood_entry(request.user, serializer.validated_data)
+        
+        # Layer 2: Format response
+        response_serializer = self.get_serializer(mood_entry)
+        return Response({
+            'status': 'success',
+            'message': 'Mood entry created successfully',
+            'data': response_serializer.data
+        }, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['get'])
+    def analytics(self, request):
+        """Get mood analytics for dashboard"""
+        # Delegate to Layer 1
+        analytics = MoodService.get_mood_analytics(request.user)
+        
+        # Layer 2: Format for API response
+        return Response({
+            'status': 'success',
+            'data': analytics,
+            'message': 'Mood analytics retrieved successfully'
+        })
 
 class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Exercise.objects.all()
+    """Layer 2: Public API for exercises"""
     serializer_class = ExerciseSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return Exercise.objects.all()
+    
+    @action(detail=False, methods=['get'])
+    def recommended(self, request):
+        """Get personalized exercise recommendations"""
+        # Delegate to Layer 1
+        exercises = ExerciseService.get_recommended_exercises(request.user)
+        
+        # Layer 2: Serialize and format
+        serializer = self.get_serializer(exercises, many=True)
+        return Response({
+            'status': 'success',
+            'data': serializer.data,
+            'count': len(exercises),
+            'message': 'Recommendations generated successfully'
+        })
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        """Log completion of an exercise"""
+        exercise = self.get_object()
+        
+        # Layer 2: Extract and validate data
+        duration = request.data.get('duration_seconds')
+        notes = request.data.get('notes', '')
+        
+        try:
+            # Delegate to Layer 1
+            session = ExerciseService.log_session(
+                user=request.user,
+                exercise_id=exercise.id,
+                duration=duration,
+                notes=notes
+            )
+            # Layer 2: Response
+            return Response({
+                'status': 'success',
+                'message': 'Exercise completed successfully',
+                'session_id': session.id
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': f'Failed to log session: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WorkoutSessionViewSet(viewsets.ModelViewSet):
@@ -139,19 +219,77 @@ class CoachRecommendationView(APIView):
 
 
 class ProfessionalSearchView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         search_query = request.query_params.get('search', '')
-        professionals = Profile.objects.filter(
-            account_type='work',
-            is_visible_for_search=True
-        )
-        if search_query:
-            professionals = professionals.filter(career_type__icontains=search_query)
+        
+        # Delegate to Layer 1
+        professionals = ProfileService.get_professionals(search_query)
+        
+        # Layer 2: Serialize and format
         serializer = ProfileSerializer(professionals, many=True)
-        return Response(serializer.data)
+        return Response({
+            'status': 'success',
+            'data': serializer.data,
+            'count': len(professionals)
+        })
+    
+class DashboardStatsView(APIView):
+    """Layer 2: Dashboard statistics endpoint"""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """Get all dashboard statistics"""
+        try:
+            # Delegate to Layer 1 services
+            mood_stats = MoodService.get_mood_analytics(request.user)
+            exercise_stats = ExerciseService.get_user_stats(request.user)
+            
+            # Layer 2: Combine and format response
+            return Response({
+                'status': 'success',
+                'data': {
+                    'mood': mood_stats,
+                    'exercises': exercise_stats
+                }
+            })
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': f'Failed to retrieve stats: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# Update existing views to use services
+class ProfileUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def put(self, request):
+        # Layer 2: Handle file uploads and validation
+        serializer = ProfileSerializer(request.user.profile, data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response({
+                'status': 'error',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Delegate to Layer 1
+            profile = ProfileService.update_profile(request.user, serializer.validated_data)
+            
+            # Layer 2: Return formatted response
+            response_serializer = ProfileSerializer(profile)
+            return Response({
+                'status': 'success',
+                'message': 'Profile updated successfully',
+                'data': response_serializer.data
+            })
+            
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': f'Failed to update profile: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ── API to get current user (for frontend after login) ──────────────────────
 @api_view(['GET'])

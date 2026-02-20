@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from . import views
 from .views import (
     home,
     RegisterView,
@@ -41,7 +41,8 @@ urlpatterns = [
 
     # All ViewSet APIs
     path('api/', include(router.urls)),
-
+    path('api/dashboard/stats/', views.DashboardStatsView.as_view(), name='dashboard-stats'),
+    
     # HTML Pages
     path('', home, name='home'),
     path('exercises/focus-reset/', focus_reset_view, name='focus_reset'),
