@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-
+from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Profile, MoodEntry, Exercise, WorkoutSession, Badge
 from .serializers import (
     UserSerializer, RegisterSerializer, ProfileSerializer,
@@ -79,16 +79,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.select_related('user').all()
     serializer_class = ProfileSerializer
     permission_classes = (IsAuthenticated,)
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_queryset(self):
         return Profile.objects.filter(user=self.request.user)
 
-    @action(detail=False, methods=['post'], url_path='update')
+    @action(detail=False, methods=['put'], url_path='update')
     def update_profile(self, request):
         profile = request.user.profile
-        if profile.account_type != 'work':
-            return Response({"error": "Only work accounts can update profiles."}, status=status.HTTP_403_FORBIDDEN)
-
         serializer = ProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -171,8 +169,10 @@ def focus_reset_view(request):
 def ease_anxiety_view(request):
     return render(request, 'api/exercises/ease_anxiety.html')
 
+
 def visualization_view(request):
     return render(request, 'api/exercises/visualization.html')
+
 
 def visualization_player_view(request):
     return render(request, 'api/exercises/player.html')

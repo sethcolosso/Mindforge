@@ -20,7 +20,7 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'profiles', ProfileViewSet, basename='profile')
+router.register(r'profile', ProfileViewSet, basename='profile')
 router.register(r'moods', MoodEntryViewSet, basename='mood')
 router.register(r'exercises', ExerciseViewSet, basename='exercise')
 router.register(r'workouts', WorkoutSessionViewSet, basename='workout')
