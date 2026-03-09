@@ -1,3 +1,14 @@
+# --- Node.js / Next.js ---
+node_modules/
+/.pnp
+.pnp.js
+/.next/
+/out/
+/build/
+.next
+*.tsbuildinfo
+.turbo/
+
 # --- Python ---
 __pycache__/
 *.py[cod]
@@ -71,6 +82,10 @@ media/
 
 # --- Environments & Secrets ---
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.env
 *.secret
 

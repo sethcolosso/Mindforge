@@ -1,0 +1,15 @@
+{
+  "buildCommand": "pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput",
+  "devCommand": "python manage.py runserver",
+  "env": {
+    "DJANGO_SECRET_KEY": "@DJANGO_SECRET_KEY",
+    "DEBUG": "False",
+    "ALLOWED_HOSTS": ".vercel.app,localhost"
+  },
+  "functions": {
+    "api/wsgi.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}
