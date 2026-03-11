@@ -1,3 +1,4 @@
+import json
 import os
 import logging
 
@@ -77,3 +78,53 @@ def get_coach_recommendation(profile_goals=None, recent_mood=None):
         }
 
     return {'source': 'rule-based', 'recommendation': rec}
+
+
+def analyze_mood_from_text(note: str):
+    """Use OpenAI to classify mood from free-text note."""
+    try:
+        import openai
+    except Exception:
+        logger.exception('openai package not installed')
+        return None
+
+    if not OPENAI_API_KEY:
+        logger.info('OPENAI_API_KEY not set; skipping OpenAI mood analysis')
+        return None
+
+    prompt = (
+        "Classify the following mood note into a score from 0-4, where "
+        "0=very negative, 1=negative, 2=neutral, 3=positive, 4=very positive. "
+        "Return strict JSON with keys: mood (int), confidence (0-1 float), reason (short string).\n\n"
+        f"Mood note: {note}"
+    )
+
+    openai.api_key = OPENAI_API_KEY
+    try:
+        resp = openai.ChatCompletion.create(
+            model='gpt-4o-mini',
+            messages=[
+                {'role': 'system', 'content': 'You analyze mood notes and return only strict JSON.'},
+                {'role': 'user', 'content': prompt},
+            ],
+            max_tokens=180,
+            temperature=0,
+        )
+        text = resp['choices'][0]['message']['content']
+        parsed = json.loads(text)
+        mood = int(parsed.get('mood', 2))
+        confidence = float(parsed.get('confidence', 0.0))
+        reason = str(parsed.get('reason', ''))
+
+        if mood < 0 or mood > 4:
+            mood = 2
+
+        return {
+            'mood': mood,
+            'confidence': max(0.0, min(1.0, confidence)),
+            'reason': reason,
+            'source': 'openai',
+        }
+    except Exception:
+        logger.exception('OpenAI mood analysis failed')
+        return None
