@@ -70,6 +70,25 @@ curl -X POST http://127.0.0.1:8000/api/moods/ -H "Authorization: Bearer <ACCESS_
 curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://127.0.0.1:8000/api/moods/
 ```
 
+
+- Infer mood from note (POST):
+```powershell
+curl -X POST http://127.0.0.1:8000/api/moods/infer/ -H "Authorization: Bearer <ACCESS_TOKEN>" -H "Content-Type: application/json" -d '{"note":"I feel stressed and overwhelmed today"}'
+```
+
+Response:
+```json
+{
+  "status": "success",
+  "data": {
+    "mood": 1,
+    "confidence": 0.79,
+    "reason": "Detected more negative than positive language",
+    "source": "fallback"
+  }
+}
+```
+
 **Exercises (read-only list)**
 - Path: `/api/exercises/`
 - Auth: Required
@@ -79,6 +98,18 @@ Example:
 ```powershell
 curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://127.0.0.1:8000/api/exercises/
 ```
+
+
+- Log when user opens an exercise (POST):
+```powershell
+curl -X POST http://127.0.0.1:8000/api/exercises/1/open/ -H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
+**Exercise Open Events**
+- Path: `/api/exercise-opens/`
+- Auth: Required
+- Read-only feed of all exercise open events for the current user.
+
 
 **Workout Sessions**
 - Path: `/api/workouts/`

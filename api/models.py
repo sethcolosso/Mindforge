@@ -108,6 +108,19 @@ class WorkoutSession(models.Model):
         return f"Workout({self.user.username}:{self.exercise})"
 
 
+class ExerciseOpenEvent(models.Model):
+    """Tracks whenever a user opens an exercise."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercise_open_events')
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, related_name='open_events')
+    opened_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-opened_at']
+
+    def __str__(self):
+        return f"ExerciseOpen({self.user.username}:{self.exercise.slug})"
+
+
 class Badge(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
