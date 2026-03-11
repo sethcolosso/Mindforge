@@ -132,15 +132,15 @@
 <aside class="left-column">
     <div class="stats-card streak">
         <h3 class="stats-title">Daily Streak</h3>
-        <div class="stats-value">7<span class="stats-unit">days</span></div>
+        <div class="stats-value" id="streakValue">0<span class="stats-unit">days</span></div>
     </div>
     <div class="stats-card mood">
         <h3 class="stats-title">Average Mood</h3>
-        <div class="stats-value">82<span class="stats-unit">%</span></div>
+        <div class="stats-value" id="avgMoodValue">0<span class="stats-unit">%</span></div>
     </div>
     <div class="stats-card exercises">
         <h3 class="stats-title">Exercises Today</h3>
-        <div class="stats-value">3</div>
+        <div class="stats-value" id="exercisesTodayValue">0</div>
     </div>
 </aside>
 
@@ -162,7 +162,7 @@
             <canvas id="pieChart" width="280" height="280"></canvas>
         </div>
         <p class="reflection">Daily Reflection</p>
-        <button class="record-btn">RECORD</button>
+        <button class="record-btn" id="recordMoodBtn">RECORD</button>
     </section>
 </main>
 </div>
@@ -170,15 +170,15 @@
 <section class="exercises">
     <h2 class="section-title">DAILY EXERCISES</h2>
     <div class="exercises-grid">
-        <div class="exercise-card" onclick="window.location.href='/exercises/focus-reset/'">
+        <div class="exercise-card" data-exercise-slug="5-min-focus-ritual" data-route="/exercises/focus-reset/">
             <img src="{% static 'api/assets/focus.webp' %}" class="exercise-icon">
             <p>Focus Reset 🧠✨</p>
         </div>
-        <div class="exercise-card" onclick="window.location.href='/exercises/ease-anxiety/'">
+        <div class="exercise-card" data-exercise-slug="2-min-anxiety-cooldown" data-route="/exercises/ease-anxiety/">
             <img src="{% static 'api/assets/anxiety.jpg' %}" class="exercise-icon">
             <p>Ease Anxiety 😮‍💨🕊️</p>
         </div>
-        <div class="exercise-card" onclick="window.location.href='/exercises/visualization/'">
+        <div class="exercise-card" data-exercise-slug="confidence-visualization" data-route="/exercises/visualization/">
             <img src="{% static 'api/assets/visualize.webp' %}" class="exercise-icon">
             <p>Visualization 👁️</p>
         </div>
@@ -407,6 +407,9 @@ async function fetchCurrentUser(){
 
         // ✅ ONLY call this (removes double header)
         updateGreetingAndHeader(user);
+        await loadDashboardData();
+        await loadMoodData();
+        await loadExerciseMap();
 
     }
     catch(e){
@@ -422,6 +425,8 @@ async function fetchCurrentUser(){
 window.signOut = function(){
     localStorage.removeItem('access_token');
     fetchCurrentUser();
+    resetDashboardToDefaults();
+    renderMoodChart([], true);
 }
 
 //////////////////////////////////////////////////
@@ -447,17 +452,33 @@ async function loadDashboardData() {
 }
 
 function updateDashboardStats(stats) {
-    // Update mood stats
+    if (!stats) return;
+
     if (stats.mood) {
-        document.querySelector('.mood .stats-value').textContent = stats.mood.average + '%';
+        const avgMoodEl = document.getElementById('avgMoodValue');
+        if (avgMoodEl) {
+            avgMoodEl.innerHTML = `${stats.mood.average}<span class="stats-unit">%</span>`;
+        }
     }
-    
-    // Update exercise stats
+
     if (stats.exercises) {
-        document.querySelector('.exercises .stats-value').textContent = stats.exercises.exercises_today;
-        document.querySelector('.streak .stats-value').innerHTML = 
-            stats.exercises.streak_days + '<span class="stats-unit">days</span>';
+        const exercisesTodayEl = document.getElementById('exercisesTodayValue');
+        const streakEl = document.getElementById('streakValue');
+
+        if (exercisesTodayEl) {
+            exercisesTodayEl.textContent = `${stats.exercises.exercises_today}`;
+        }
+
+        if (streakEl) {
+            streakEl.innerHTML = `${stats.exercises.streak_days}<span class="stats-unit">days</span>`;
+        }
     }
+}
+
+function resetDashboardToDefaults() {
+    document.getElementById('avgMoodValue').innerHTML = '0<span class="stats-unit">%</span>';
+    document.getElementById('exercisesTodayValue').textContent = '0';
+    document.getElementById('streakValue').innerHTML = '0<span class="stats-unit">days</span>';
 }
 // Load recommended exercises
 async function loadRecommendedExercises() {
@@ -559,6 +580,9 @@ signinForm.addEventListener('submit', async(e)=>{
         setToken(result.access);
 
         await fetchCurrentUser();
+        await loadDashboardData();
+        await loadMoodData();
+        await loadExerciseMap();
 
         closeModal('signinModal');
 
@@ -654,32 +678,196 @@ profileForm.addEventListener('submit', async function(e){
 }
 
 //////////////////////////////////////////////////
-// PIE CHART (UNCHANGED)
+// LIVE MOOD + EXERCISE TRACKING WIRING
 //////////////////////////////////////////////////
 
-const ctx = document.getElementById('pieChart');
+let moodChart = null;
+let exerciseMapBySlug = {};
 
-if(ctx){
-new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: ['Happy', 'Stressed', 'Calm'],
-        datasets: [{
-            data: [12,5,7],
-            backgroundColor:['#22c55e','#ef4444','#3b82f6']
-        }]
-    },
-    options:{
-        responsive:true,
-        plugins:{legend:{position:'bottom'}}
+function renderMoodChart(moodEntries = [], emptyState = false) {
+    const ctx = document.getElementById('pieChart');
+    if (!ctx) return;
+
+    const chartLabels = ['Very Negative', 'Negative', 'Neutral', 'Positive', 'Very Positive'];
+    let chartData = [0, 0, 0, 0, 0];
+
+    if (!emptyState && Array.isArray(moodEntries) && moodEntries.length > 0) {
+        moodEntries.forEach((entry) => {
+            const mood = Number(entry.mood);
+            if (!Number.isNaN(mood) && mood >= 0 && mood <= 4) {
+                chartData[mood] += 1;
+            }
+        });
+    } else {
+        chartData = [0, 0, 1, 0, 0];
     }
-});
+
+    if (moodChart) {
+        moodChart.destroy();
+    }
+
+    moodChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                data: chartData,
+                backgroundColor: ['#b91c1c', '#f97316', '#3b82f6', '#22c55e', '#15803d']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
 }
 
-//////////////////////////////////////////////////
-// INIT
-//////////////////////////////////////////////////
+async function loadMoodData() {
+    const token = getToken();
+    if (!token) {
+        renderMoodChart([], true);
+        return;
+    }
 
+    try {
+        const response = await fetch('/api/moods/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!response.ok) {
+            renderMoodChart([], true);
+            return;
+        }
+
+        const moods = await response.json();
+        renderMoodChart(moods);
+    } catch (error) {
+        console.error('Failed to load moods:', error);
+        renderMoodChart([], true);
+    }
+}
+
+async function loadExerciseMap() {
+    const token = getToken();
+    if (!token) {
+        exerciseMapBySlug = {};
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/exercises/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const exercises = await response.json();
+        exerciseMapBySlug = (exercises || []).reduce((acc, ex) => {
+            acc[ex.slug] = ex.id;
+            return acc;
+        }, {});
+    } catch (error) {
+        console.error('Failed to load exercises:', error);
+    }
+}
+
+async function recordMoodFromReflection() {
+    const token = getToken();
+    if (!token) {
+        alert('Please sign in first.');
+        return;
+    }
+
+    const note = prompt('How are you feeling right now?');
+    if (!note || !note.trim()) {
+        return;
+    }
+
+    try {
+        const inferRes = await fetch('/api/moods/infer/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ note })
+        });
+
+        if (!inferRes.ok) {
+            throw new Error('Mood inference failed');
+        }
+
+        const inferData = await inferRes.json();
+        const inferredMood = inferData?.data?.mood;
+
+        const createRes = await fetch('/api/moods/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ mood: inferredMood, note })
+        });
+
+        if (!createRes.ok) {
+            throw new Error('Mood save failed');
+        }
+
+        alert(`Mood recorded (score ${inferredMood}/4).`);
+        await loadDashboardData();
+        await loadMoodData();
+    } catch (error) {
+        console.error(error);
+        alert('Could not record mood. Please try again.');
+    }
+}
+
+async function trackExerciseOpen(slug) {
+    const token = getToken();
+    if (!token) return;
+
+    const exerciseId = exerciseMapBySlug[slug];
+    if (!exerciseId) return;
+
+    try {
+        await fetch(`/api/exercises/${exerciseId}/open/`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            keepalive: true,
+        });
+    } catch (error) {
+        console.error('Failed to track exercise open:', error);
+    }
+}
+
+function wireExerciseCards() {
+    const cards = document.querySelectorAll('.exercise-card');
+    cards.forEach((card) => {
+        card.addEventListener('click', async () => {
+            const slug = card.dataset.exerciseSlug;
+            const route = card.dataset.route;
+
+            if (slug) {
+                await trackExerciseOpen(slug);
+                await loadDashboardData();
+            }
+
+            if (route) {
+                window.location.href = route;
+            }
+        });
+    });
+}
+
+const recordMoodBtn = document.getElementById('recordMoodBtn');
+if (recordMoodBtn) {
+    recordMoodBtn.addEventListener('click', recordMoodFromReflection);
+}
+
+wireExerciseCards();
+renderMoodChart([], true);
 fetchCurrentUser();
 
 });
