@@ -79,7 +79,6 @@ class ExerciseService:
         return {
             'exercises_today': today_count,
             'exercise_opens_today': opens_today,
-            'exercise_activity_today': today_count + opens_today,
             'streak_days': streak,
             'total_sessions': WorkoutSession.objects.filter(user=user).count(),
             'total_exercise_opens': ExerciseOpenEvent.objects.filter(user=user).count(),
@@ -97,12 +96,7 @@ class ExerciseService:
                 completed_at__date=current_date
             ).exists()
 
-            has_open = ExerciseOpenEvent.objects.filter(
-                user=user,
-                opened_at__date=current_date
-            ).exists()
-
-            if not (has_session or has_open):
+            if not has_session:
                 break
 
             streak += 1

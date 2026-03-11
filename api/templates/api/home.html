@@ -173,7 +173,7 @@
         <div class="stats-value" id="avgMoodValue">0<span class="stats-unit">%</span></div>
     </div>
     <div class="stats-card exercises">
-        <h3 class="stats-title">Exercise Activity Today</h3>
+        <h3 class="stats-title">Exercises Today</h3>
         <div class="stats-value" id="exercisesTodayValue">0</div>
     </div>
 </aside>
@@ -525,8 +525,7 @@ function updateDashboardStats(stats) {
         const streakEl = document.getElementById('streakValue');
 
         if (exercisesTodayEl) {
-            const exercisesToday = stats.exercises.exercise_activity_today ?? (stats.exercises.exercises_today + (stats.exercises.exercise_opens_today || 0));
-            exercisesTodayEl.textContent = `${exercisesToday}`;
+            exercisesTodayEl.textContent = `${stats.exercises.exercises_today}`;
         }
 
         if (streakEl) {
@@ -902,67 +901,6 @@ async function trackExerciseOpen(slug) {
     }
 }
 
-
-function runBreathingTool() {
-    const statusEl = document.getElementById('breathingStatus');
-    if (!statusEl) return;
-
-    const sequence = ['Inhale 4s', 'Hold 4s', 'Exhale 4s', 'Hold 4s'];
-    let index = 0;
-    statusEl.textContent = sequence[index];
-
-    const timer = setInterval(() => {
-        index += 1;
-        if (index >= sequence.length) {
-            clearInterval(timer);
-            statusEl.textContent = 'Done. Great reset ✅';
-            return;
-        }
-        statusEl.textContent = sequence[index];
-    }, 4000);
-}
-
-function initMentalTools() {
-    const breathingBtn = document.getElementById('breathingToolBtn');
-    const gratitudeBtn = document.getElementById('gratitudeToolBtn');
-    const intentionBtn = document.getElementById('intentionToolBtn');
-
-    const gratitudeStatus = document.getElementById('gratitudeStatus');
-    const intentionStatus = document.getElementById('intentionStatus');
-
-    if (breathingBtn) {
-        breathingBtn.addEventListener('click', runBreathingTool);
-    }
-
-    const savedGratitude = localStorage.getItem('mindforge_gratitude_note');
-    if (savedGratitude && gratitudeStatus) {
-        gratitudeStatus.textContent = savedGratitude;
-    }
-
-    const savedIntention = localStorage.getItem('mindforge_daily_intention');
-    if (savedIntention && intentionStatus) {
-        intentionStatus.textContent = savedIntention;
-    }
-
-    if (gratitudeBtn) {
-        gratitudeBtn.addEventListener('click', () => {
-            const note = prompt('Write one thing you are grateful for today:');
-            if (!note || !note.trim()) return;
-            localStorage.setItem('mindforge_gratitude_note', note.trim());
-            if (gratitudeStatus) gratitudeStatus.textContent = note.trim();
-        });
-    }
-
-    if (intentionBtn) {
-        intentionBtn.addEventListener('click', () => {
-            const intention = prompt('What is your intention for today?');
-            if (!intention || !intention.trim()) return;
-            localStorage.setItem('mindforge_daily_intention', intention.trim());
-            if (intentionStatus) intentionStatus.textContent = intention.trim();
-        });
-    }
-}
-
 function wireExerciseCards() {
     const cards = document.querySelectorAll('.exercise-card');
     cards.forEach((card) => {
@@ -988,7 +926,6 @@ if (recordMoodBtn) {
 }
 
 wireExerciseCards();
-initMentalTools();
 renderMoodChart([], true);
 fetchCurrentUser();
 
