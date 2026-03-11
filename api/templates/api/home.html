@@ -111,6 +111,40 @@
         .happy { background-color: #22c55e; }
         .stressed { background-color: #ef4444; }
         .calm { background-color: #3b82f6; }
+
+        .mental-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .tool-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 0.9rem;
+            padding: 1rem;
+        }
+        .tool-card h3 {
+            margin-bottom: 0.4rem;
+        }
+        .tool-card p {
+            color: #cbd5e1;
+            margin-bottom: 0.8rem;
+            font-size: 0.92rem;
+        }
+        .tool-btn {
+            background: #2dd4bf;
+            color: #0f172a;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.55rem 0.9rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tool-status {
+            margin-top: 0.6rem;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
     </style>
 </head>
 <body>
@@ -190,6 +224,31 @@
     <div class="coach-card">
         <script defer data-relevanceai-share-id="bcbe5a/361a045b4ae0-465d-b26a-7835a319c7a2/2ea9a053-f456-4a2d-9b06-1fb89346c982" src="https://app.relevanceai.com/embed/chat-bubble.js" data-share-styles="hide_tool_steps=false&hide_file_uploads=false&hide_conversation_list=false&bubble_style=agent&primary_color=%232a293d&bubble_icon=pd%2Fchat&input_placeholder_text=Type+your+message...&hide_logo=false&hide_description=false" ></script>
         <p>Ask me anything...</p>
+    </div>
+</section>
+
+
+<section class="mental-tools">
+    <h2 class="section-title">MENTAL FITNESS TOOLS</h2>
+    <div class="mental-tools-grid">
+        <div class="tool-card">
+            <h3>60s Box Breathing</h3>
+            <p>Follow a short breathing timer to quickly reset your nervous system.</p>
+            <button class="tool-btn" id="breathingToolBtn">Start</button>
+            <div class="tool-status" id="breathingStatus">Ready</div>
+        </div>
+        <div class="tool-card">
+            <h3>Gratitude Note</h3>
+            <p>Capture one positive moment from your day.</p>
+            <button class="tool-btn" id="gratitudeToolBtn">Add Note</button>
+            <div class="tool-status" id="gratitudeStatus">No note yet.</div>
+        </div>
+        <div class="tool-card">
+            <h3>Daily Intention</h3>
+            <p>Set one intention to focus your day.</p>
+            <button class="tool-btn" id="intentionToolBtn">Set Intention</button>
+            <div class="tool-status" id="intentionStatus">No intention set.</div>
+        </div>
     </div>
 </section>
 
