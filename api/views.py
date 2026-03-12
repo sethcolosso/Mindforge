@@ -8,11 +8,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import Profile, MoodEntry, Exercise, WorkoutSession, Badge
+from .models import Profile, MoodEntry, Exercise, WorkoutSession, Badge, ExerciseOpenEvent
 from .serializers import (
     UserSerializer, RegisterSerializer, ProfileSerializer,
     MoodEntrySerializer, ExerciseSerializer, WorkoutSessionSerializer,
-    BadgeSerializer
+    BadgeSerializer, ExerciseOpenEventSerializer
 )
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.utils import timezone
@@ -125,6 +125,22 @@ class MoodEntryViewSet(viewsets.ModelViewSet):
             'data': response_serializer.data
         }, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['post'], url_path='infer')
+    def infer(self, request):
+        """Infer mood score from a text note using LLM/fallback logic."""
+        note = request.data.get('note', '')
+        if not str(note).strip():
+            return Response({
+                'status': 'error',
+                'message': 'note is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        result = MoodService.infer_mood(note)
+        return Response({
+            'status': 'success',
+            'data': result
+        })
+
     @action(detail=False, methods=['get'])
     def analytics(self, request):
         """Get mood analytics for dashboard"""
@@ -146,6 +162,43 @@ class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Exercise.objects.all()
     
+    @action(detail=True, methods=['post'])
+    def open(self, request, pk=None):
+        """Log that the user opened an exercise."""
+        exercise = self.get_object()
+        event = ExerciseService.log_open_event(user=request.user, exercise_id=exercise.id)
+        return Response({
+            'status': 'success',
+            'message': 'Exercise open event recorded',
+            'data': ExerciseOpenEventSerializer(event).data
+        }, status=status.HTTP_201_CREATED)
+
+
+    @action(detail=False, methods=['post'], url_path='open-by-slug')
+    def open_by_slug(self, request):
+        """Log that the user opened an exercise by slug."""
+        slug = request.data.get('slug')
+        if not slug:
+            return Response({
+                'status': 'error',
+                'message': 'slug is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            exercise = Exercise.objects.get(slug=slug)
+        except Exercise.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Exercise not found for provided slug'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        event = ExerciseService.log_open_event(user=request.user, exercise_id=exercise.id)
+        return Response({
+            'status': 'success',
+            'message': 'Exercise open event recorded',
+            'data': ExerciseOpenEventSerializer(event).data
+        }, status=status.HTTP_201_CREATED)
+
     @action(detail=False, methods=['get'])
     def recommended(self, request):
         """Get personalized exercise recommendations"""
@@ -201,6 +254,15 @@ class WorkoutSessionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+
+
+
+class ExerciseOpenEventViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ExerciseOpenEventSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return ExerciseOpenEvent.objects.filter(user=self.request.user)
 
 class BadgeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Badge.objects.all()
