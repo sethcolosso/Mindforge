@@ -1,7 +1,9 @@
 from ..models import Exercise, WorkoutSession, Profile, ExerciseOpenEvent
 from django.contrib.auth.models import User
 from typing import List, Dict
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
+
 
 
 class ExerciseService:
@@ -15,7 +17,7 @@ class ExerciseService:
         # Get recent sessions to avoid repetition
         recent_sessions = WorkoutSession.objects.filter(
             user=user,
-            completed_at__gte=datetime.now() - timedelta(days=3)
+            completed_at__gte=timezone.now() - timedelta(days=3)
         ).values_list('exercise_id', flat=True)
 
         # Base query excluding recent exercises
