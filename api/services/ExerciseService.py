@@ -5,7 +5,6 @@ from datetime import timedelta
 from django.utils import timezone
 
 
-
 class ExerciseService:
     """Layer 1: Internal business logic for exercises"""
 
