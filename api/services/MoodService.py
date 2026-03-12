@@ -2,8 +2,7 @@ from django.contrib.auth.models import User
 from ..models import MoodEntry
 from typing import List, Optional
 from django.db.models import Avg, Count
-from datetime import timedelta
-from django.utils import timezone
+from datetime import datetime, timedelta
 from .openai_service import analyze_mood_from_text
 
 
@@ -76,40 +75,35 @@ class MoodService:
         `average` is intentionally based on the last 24 hours so it naturally
         resets each day for the home card.
         """
-        now = timezone.now()
+        now = datetime.now()
         last_30_days = MoodEntry.objects.filter(
             user=user,
             created_at__gte=now - timedelta(days=30)
         )
 
-        last_24_hours = MoodEntry.objects.filter(
-            user=user,
-            created_at__gte=now - timedelta(hours=24)
-        )
-
-        if not last_30_days.exists() and not last_24_hours.exists():
+        if not recent_moods.exists():
             return {'average': 0, 'count': 0, 'trend': 'neutral'}
 
-        daily_avg = last_24_hours.aggregate(avg=Avg('mood'))['avg']
-        daily_count = last_24_hours.aggregate(total=Count('id'))['total'] or 0
+        stats = recent_moods.aggregate(
+            avg_mood=Avg('mood'),
+            total_count=Count('id')
+        )
 
-        # Calculate trend (last 7 days vs previous 7 days) from 30-day window
-        last_week = last_30_days.filter(
-            created_at__gte=now - timedelta(days=7)
+        # Calculate trend (last 7 days vs previous 7 days)
+        last_week = recent_moods.filter(
+            created_at__gte=datetime.now() - timedelta(days=7)
         ).aggregate(avg=Avg('mood'))['avg'] or 0
 
-        prev_week = last_30_days.filter(
-            created_at__gte=now - timedelta(days=14),
-            created_at__lt=now - timedelta(days=7)
+        prev_week = recent_moods.filter(
+            created_at__gte=datetime.now() - timedelta(days=14),
+            created_at__lt=datetime.now() - timedelta(days=7)
         ).aggregate(avg=Avg('mood'))['avg'] or 0
 
         trend = 'improving' if last_week > prev_week else 'declining' if last_week < prev_week else 'stable'
-
-        latest_entry = MoodEntry.objects.filter(user=user).order_by('-created_at').first()
 
         return {
             'average': round((daily_avg or 0) * 20, 1),  # 24h average as percentage
             'count': daily_count,
             'trend': trend,
-            'latest': latest_entry.mood if latest_entry else None
+            'latest': recent_moods.first().mood if recent_moods.exists() else None
         }

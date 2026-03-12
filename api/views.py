@@ -173,32 +173,6 @@ class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
             'data': ExerciseOpenEventSerializer(event).data
         }, status=status.HTTP_201_CREATED)
 
-
-    @action(detail=False, methods=['post'], url_path='open-by-slug')
-    def open_by_slug(self, request):
-        """Log that the user opened an exercise by slug."""
-        slug = request.data.get('slug')
-        if not slug:
-            return Response({
-                'status': 'error',
-                'message': 'slug is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            exercise = Exercise.objects.get(slug=slug)
-        except Exercise.DoesNotExist:
-            return Response({
-                'status': 'error',
-                'message': 'Exercise not found for provided slug'
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        event = ExerciseService.log_open_event(user=request.user, exercise_id=exercise.id)
-        return Response({
-            'status': 'success',
-            'message': 'Exercise open event recorded',
-            'data': ExerciseOpenEventSerializer(event).data
-        }, status=status.HTTP_201_CREATED)
-
     @action(detail=False, methods=['get'])
     def recommended(self, request):
         """Get personalized exercise recommendations"""
