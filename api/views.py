@@ -187,6 +187,40 @@ class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
             'count': len(exercises),
             'message': 'Recommendations generated successfully'
         })
+    @action(detail=False, methods=['post'], url_path='complete-by-slug')
+    def complete_by_slug(self, request):
+        """Log completion for an exercise by slug."""
+        slug = request.data.get('slug')
+        if not slug:
+            return Response({
+                'status': 'error',
+                'message': 'slug is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            exercise = Exercise.objects.get(slug=slug)
+        except Exercise.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Exercise not found for provided slug'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        duration = request.data.get('duration_seconds')
+        notes = request.data.get('notes', '')
+
+        session = ExerciseService.log_session(
+            user=request.user,
+            exercise_id=exercise.id,
+            duration=duration,
+            notes=notes,
+        )
+
+        return Response({
+            'status': 'success',
+            'message': 'Exercise completed successfully',
+            'session_id': session.id,
+        }, status=status.HTTP_201_CREATED)
+
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         """Log completion of an exercise"""

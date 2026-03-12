@@ -104,6 +104,7 @@
 
     <audio id="soundPlayer" loop preload="auto"></audio>
 
+    <script src="{% static 'api/js/exercise_tracking.js' %}"></script>
     <script>
         // ── Variables ────────────────────────────────────────────────────────
         const envSelect              = document.getElementById('environment');
@@ -415,28 +416,28 @@
     }
 
     try {
-        const response = await fetch('/api/exercises/1/complete/', {  // Assuming focus exercise ID = 1
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                duration_seconds: Math.floor(Math.random() * 300) + 300,  // 5-10 minutes
-                notes: 'Focus reset session completed'
-            })
-        });
-        if (response.ok) {
-            const result = await response.json();
-            alert(result.message || "Session logged successfully!");
+        const ok = window.MindForgeExerciseTracking
+            ? await window.MindForgeExerciseTracking.completeBySlug(
+                '5-min-focus-ritual',
+                Math.floor(Math.random() * 300) + 300,
+                'Focus reset session completed'
+              )
+            : false;
+
+        if (ok) {
+            alert('Session logged successfully!');
         } else {
-            alert("Failed to log session");
+            alert('Failed to log session');
         }
     } catch (error) {
         console.error('Session logging failed:', error);
         alert("Network error while logging session");
     }
 });
+            // Track open event on page load
+        if (window.MindForgeExerciseTracking) {
+            window.MindForgeExerciseTracking.trackOpenBySlug('5-min-focus-ritual');
+        }
     </script>
 </body>
 </html>
