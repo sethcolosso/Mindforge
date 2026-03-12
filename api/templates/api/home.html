@@ -173,7 +173,7 @@
         <div class="stats-value" id="avgMoodValue">0<span class="stats-unit">%</span></div>
     </div>
     <div class="stats-card exercises">
-        <h3 class="stats-title">Exercise Activity Today</h3>
+        <h3 class="stats-title">Exercises Today</h3>
         <div class="stats-value" id="exercisesTodayValue">0</div>
     </div>
 </aside>
@@ -184,6 +184,12 @@
     </h1>
 
     <p class="tagline">Train your mind like you train your body</p>
+
+<section class="card" style="margin: 1rem 0 1.2rem 0;">
+    <h2 class="section-title">OUR VISION & MISSION</h2>
+    <p><strong>Vision:</strong> Make daily mental fitness as normal and accessible as physical fitness.</p>
+    <p><strong>Mission:</strong> Help every user track mood, build healthy mental habits, and access the right support at the right time using guided tools and AI-assisted recommendations.</p>
+</section>
 
 
     <section class="card mood-card">
@@ -229,44 +235,28 @@
 </section>
 
 
-
-<section class="therapy-guide">
-    <h2 class="section-title">FIND THE RIGHT SUPPORT</h2>
-    <div class="tool-card">
-        <p>Answer 3 quick questions and get a suggestion: self-care break, therapist, or urgent support route.</p>
-        <button class="tool-btn" id="therapyQuizBtn" type="button">Start 3-Question Check</button>
-        <div class="tool-status" id="therapyStatus">No assessment yet.</div>
-    </div>
-</section>
-
 <section class="mental-tools">
     <h2 class="section-title">MENTAL FITNESS TOOLS</h2>
     <div class="mental-tools-grid">
         <div class="tool-card">
             <h3>60s Box Breathing</h3>
             <p>Follow a short breathing timer to quickly reset your nervous system.</p>
-            <button class="tool-btn" id="breathingToolBtn" type="button">Start</button>
+            <button class="tool-btn" id="breathingToolBtn">Start</button>
             <div class="tool-status" id="breathingStatus">Ready</div>
         </div>
         <div class="tool-card">
             <h3>Gratitude Note</h3>
             <p>Capture one positive moment from your day.</p>
-            <button class="tool-btn" id="gratitudeToolBtn" type="button">Add Note</button>
+            <button class="tool-btn" id="gratitudeToolBtn">Add Note</button>
             <div class="tool-status" id="gratitudeStatus">No note yet.</div>
         </div>
         <div class="tool-card">
             <h3>Daily Intention</h3>
             <p>Set one intention to focus your day.</p>
-            <button class="tool-btn" id="intentionToolBtn" type="button">Set Intention</button>
+            <button class="tool-btn" id="intentionToolBtn">Set Intention</button>
             <div class="tool-status" id="intentionStatus">No intention set.</div>
         </div>
     </div>
-</section>
-
-<section class="card" style="margin: 1rem 0 1.2rem 0;">
-    <h2 class="section-title">OUR VISION & MISSION</h2>
-    <p><strong>Vision:</strong> Make daily mental fitness as normal and accessible as physical fitness.</p>
-    <p><strong>Mission:</strong> Help every user track mood, build healthy mental habits, and access the right support at the right time using guided tools and AI-assisted recommendations.</p>
 </section>
 
 </div>
@@ -485,6 +475,7 @@ async function fetchCurrentUser(){
         updateGreetingAndHeader(user);
         await loadDashboardData();
         await loadMoodData();
+        await loadExerciseMap();
 
     }
     catch(e){
@@ -541,22 +532,12 @@ function updateDashboardStats(stats) {
         const streakEl = document.getElementById('streakValue');
 
         if (exercisesTodayEl) {
-            const exercisesToday = stats.exercises.exercise_activity_today ?? (stats.exercises.exercises_today + (stats.exercises.exercise_opens_today || 0));
-            exercisesTodayEl.textContent = `${exercisesToday}`;
+            exercisesTodayEl.textContent = `${stats.exercises.exercises_today}`;
         }
 
         if (streakEl) {
             streakEl.innerHTML = `${stats.exercises.streak_days}<span class="stats-unit">days</span>`;
         }
-    }
-}
-
-function bumpExerciseActivityToday() {
-    const exercisesTodayEl = document.getElementById('exercisesTodayValue');
-    if (!exercisesTodayEl) return;
-    const current = Number(exercisesTodayEl.textContent || '0');
-    if (!Number.isNaN(current)) {
-        exercisesTodayEl.textContent = String(current + 1);
     }
 }
 
@@ -667,6 +648,7 @@ signinForm.addEventListener('submit', async(e)=>{
         await fetchCurrentUser();
         await loadDashboardData();
         await loadMoodData();
+        await loadExerciseMap();
 
         closeModal('signinModal');
 
@@ -766,15 +748,11 @@ profileForm.addEventListener('submit', async function(e){
 //////////////////////////////////////////////////
 
 let moodChart = null;
+let exerciseMapBySlug = {};
 
 function renderMoodChart(moodEntries = [], emptyState = false) {
     const ctx = document.getElementById('pieChart');
     if (!ctx) return;
-
-    if (typeof Chart === 'undefined') {
-        console.warn('Chart.js not loaded; skipping mood chart render.');
-        return;
-    }
 
     const chartLabels = ['Very Negative', 'Negative', 'Neutral', 'Positive', 'Very Positive'];
     let chartData = [0, 0, 0, 0, 0];
@@ -835,6 +813,32 @@ async function loadMoodData() {
     }
 }
 
+async function loadExerciseMap() {
+    const token = getToken();
+    if (!token) {
+        exerciseMapBySlug = {};
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/exercises/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const exercises = await response.json();
+        exerciseMapBySlug = (exercises || []).reduce((acc, ex) => {
+            acc[ex.slug] = ex.id;
+            return acc;
+        }, {});
+    } catch (error) {
+        console.error('Failed to load exercises:', error);
+    }
+}
+
 async function recordMoodFromReflection() {
     const token = getToken();
     if (!token) {
@@ -878,9 +882,8 @@ async function recordMoodFromReflection() {
         }
 
         alert(`Mood recorded (score ${inferredMood}/4).`);
-        await loadMoodData();
         await loadDashboardData();
-        setTimeout(loadDashboardData, 600);
+        await loadMoodData();
     } catch (error) {
         console.error(error);
         alert('Could not record mood. Please try again.');
@@ -889,184 +892,19 @@ async function recordMoodFromReflection() {
 
 async function trackExerciseOpen(slug) {
     const token = getToken();
-    if (!token || !slug) return false;
+    if (!token) return;
+
+    const exerciseId = exerciseMapBySlug[slug];
+    if (!exerciseId) return;
 
     try {
-        // Primary: open by slug
-        const bySlugRes = await fetch('/api/exercises/open-by-slug/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ slug }),
-            keepalive: true,
-        });
-
-        if (bySlugRes.ok) return true;
-
-        // Fallback: resolve id then call /open/
-        const listRes = await fetch('/api/exercises/', {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!listRes.ok) return false;
-
-        const exercises = await listRes.json();
-        const found = (exercises || []).find((e) => e.slug === slug);
-        if (!found) return false;
-
-        const byIdRes = await fetch(`/api/exercises/${found.id}/open/`, {
+        await fetch(`/api/exercises/${exerciseId}/open/`, {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
             keepalive: true,
         });
-
-        return byIdRes.ok;
     } catch (error) {
         console.error('Failed to track exercise open:', error);
-        return false;
-    }
-}
-
-function runBreathingTool() {
-    const statusEl = document.getElementById('breathingStatus');
-    if (!statusEl) return;
-
-    const sequence = ['Inhale 4s', 'Hold 4s', 'Exhale 4s', 'Hold 4s'];
-    let index = 0;
-    statusEl.textContent = sequence[index];
-
-    const timer = setInterval(() => {
-        index += 1;
-        if (index >= sequence.length) {
-            clearInterval(timer);
-            statusEl.textContent = 'Done. Great reset ✅';
-            return;
-        }
-        statusEl.textContent = sequence[index];
-    }, 4000);
-}
-
-window.__mindforgeRunBreathing = runBreathingTool;
-
-function initMentalTools() {
-    // Ensure globals are set even if a later operation fails
-    window.__mindforgeRunBreathing = runBreathingTool;
-    window.__mindforgeGratitude = handleGratitudeInput;
-    window.__mindforgeIntention = handleIntentionInput;
-    window.__mindforgeTherapyQuiz = runTherapyQuiz;
-
-    const breathingBtn = document.getElementById('breathingToolBtn');
-    const gratitudeBtn = document.getElementById('gratitudeToolBtn');
-    const intentionBtn = document.getElementById('intentionToolBtn');
-
-    const gratitudeStatus = document.getElementById('gratitudeStatus');
-    const intentionStatus = document.getElementById('intentionStatus');
-
-    if (breathingBtn) {
-        breathingBtn.addEventListener('click', runBreathingTool);
-    }
-
-    const savedGratitude = localStorage.getItem('mindforge_gratitude_note');
-    if (savedGratitude && gratitudeStatus) {
-        gratitudeStatus.textContent = savedGratitude;
-    }
-
-    const savedIntention = localStorage.getItem('mindforge_daily_intention');
-    if (savedIntention && intentionStatus) {
-        intentionStatus.textContent = savedIntention;
-    }
-
-    function handleGratitudeInput() {
-        const note = prompt('Write one thing you are grateful for today:');
-        if (!note || !note.trim()) return;
-        localStorage.setItem('mindforge_gratitude_note', note.trim());
-        if (gratitudeStatus) gratitudeStatus.textContent = note.trim();
-    }
-
-    function handleIntentionInput() {
-        const intention = prompt('What is your intention for today?');
-        if (!intention || !intention.trim()) return;
-        localStorage.setItem('mindforge_daily_intention', intention.trim());
-        if (intentionStatus) intentionStatus.textContent = intention.trim();
-    }
-
-    if (gratitudeBtn) gratitudeBtn.addEventListener('click', handleGratitudeInput);
-    if (intentionBtn) intentionBtn.addEventListener('click', handleIntentionInput);
-
-    const therapyBtn = document.getElementById('therapyQuizBtn');
-    if (therapyBtn) therapyBtn.addEventListener('click', runTherapyQuiz);
-
-}
-
-
-async function runTherapyQuiz() {
-    const token = getToken();
-    const statusEl = document.getElementById('therapyStatus');
-
-    if (!token) {
-        alert('Please sign in first.');
-        return;
-    }
-
-    const stress = prompt('In the last 7 days, how stressed did you feel from 1-10?');
-    if (stress === null) return;
-    const sleep = prompt('How has your sleep been? (good / okay / poor)');
-    if (sleep === null) return;
-    const safety = prompt('Are you feeling unsafe or in crisis right now? (yes / no)');
-    if (safety === null) return;
-
-    const note = `Stress:${stress}; Sleep:${sleep}; Safety:${safety}`;
-
-    try {
-        const inferRes = await fetch('/api/moods/infer/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ note })
-        });
-
-        let moodScore = 2;
-        if (inferRes.ok) {
-            const inferData = await inferRes.json();
-            moodScore = inferData?.data?.mood ?? 2;
-        }
-
-        const recRes = await fetch('/api/coach/recommendation/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                recent_mood: moodScore,
-                profile_goals: ['support', 'stress relief']
-            })
-        });
-
-        let recommendationText = 'Take a short recovery break and hydrate.';
-        if (recRes.ok) {
-            const recData = await recRes.json();
-            recommendationText = recData?.text || recData?.recommendation?.title || recommendationText;
-        }
-
-        const safetyLower = String(safety).toLowerCase();
-        const stressNum = Number(stress);
-
-        if (safetyLower.includes('yes')) {
-            statusEl.textContent = 'Urgent: please contact a local emergency line or trusted person immediately.';
-        } else if (!Number.isNaN(stressNum) && stressNum >= 8) {
-            statusEl.textContent = `High stress detected. Suggested: therapist/counsellor consult. AI tip: ${recommendationText}`;
-        } else if (moodScore <= 1) {
-            statusEl.textContent = `You may benefit from talking to a specialist this week. AI tip: ${recommendationText}`;
-        } else {
-            statusEl.textContent = `Likely needs a recovery break + self-guided tools. AI tip: ${recommendationText}`;
-        }
-    } catch (error) {
-        console.error('Therapy quiz failed:', error);
-        statusEl.textContent = 'Could not run assessment right now.';
     }
 }
 
@@ -1078,18 +916,12 @@ function wireExerciseCards() {
             const route = card.dataset.route;
 
             if (slug) {
-                const tracked = await trackExerciseOpen(slug);
-                if (tracked) {
-                    bumpExerciseActivityToday();
-                }
+                await trackExerciseOpen(slug);
                 await loadDashboardData();
-                if (!tracked) {
-                    console.warn('Exercise open tracking did not complete for slug:', slug);
-                }
             }
 
             if (route) {
-                setTimeout(() => { window.location.href = route; }, 80);
+                window.location.href = route;
             }
         });
     });
@@ -1101,19 +933,7 @@ if (recordMoodBtn) {
 }
 
 wireExerciseCards();
-
-try {
-    initMentalTools();
-} catch (error) {
-    console.error('Failed to initialize mental tools:', error);
-}
-
-try {
-    renderMoodChart([], true);
-} catch (error) {
-    console.error('Failed to render mood chart:', error);
-}
-
+renderMoodChart([], true);
 fetchCurrentUser();
 
 });
