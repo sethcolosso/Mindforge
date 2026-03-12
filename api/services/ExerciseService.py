@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.utils import timezone
 
 
+
 class ExerciseService:
     """Layer 1: Internal business logic for exercises"""
 
@@ -61,7 +62,7 @@ class ExerciseService:
     @staticmethod
     def get_user_stats(user: User) -> Dict:
         """Get exercise statistics for the user"""
-        today = timezone.now().date()
+        today = datetime.now().date()
 
         # Today's exercises
         today_count = WorkoutSession.objects.filter(
@@ -80,7 +81,6 @@ class ExerciseService:
         return {
             'exercises_today': today_count,
             'exercise_opens_today': opens_today,
-            'exercise_activity_today': today_count + opens_today,
             'streak_days': streak,
             'total_sessions': WorkoutSession.objects.filter(user=user).count(),
             'total_exercise_opens': ExerciseOpenEvent.objects.filter(user=user).count(),
@@ -90,7 +90,7 @@ class ExerciseService:
     def _calculate_streak(user: User) -> int:
         """Calculate current daily streak"""
         streak = 0
-        current_date = timezone.now().date()
+        current_date = datetime.now().date()
 
         while True:
             has_session = WorkoutSession.objects.filter(
@@ -98,12 +98,7 @@ class ExerciseService:
                 completed_at__date=current_date
             ).exists()
 
-            has_open = ExerciseOpenEvent.objects.filter(
-                user=user,
-                opened_at__date=current_date
-            ).exists()
-
-            if not (has_session or has_open):
+            if not has_session:
                 break
 
             streak += 1
