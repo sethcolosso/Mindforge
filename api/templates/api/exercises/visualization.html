@@ -125,6 +125,15 @@
         <button class="btn-primary-glow">Start Visualization</button>
     </div>
 </section>
+<script src="{% static 'api/js/exercise_tracking.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.MindForgeExerciseTracking) {
+      window.MindForgeExerciseTracking.trackOpenBySlug('confidence-visualization');
+    }
+  });
+</script>
 <script src="{% static 'api/js/visualizationscripts.js' %}"></script>
+
 </body>
 </html>

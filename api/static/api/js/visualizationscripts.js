@@ -37,10 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.textContent = "Preparing Sanctuary...";
         startBtn.style.opacity = "0.7";
         
-        // Redirect or trigger visualization player after 1.5 seconds
-        // Redirect or trigger visualization player after 1.5 seconds
+        // Mark completion for dashboard + streak if signed in
+        if (window.MindForgeExerciseTracking) {
+            window.MindForgeExerciseTracking.completeBySlug(
+                'confidence-visualization',
+                Number(selectedDuration) * 60,
+                `Visualization session started with ${selectedTheme} theme`
+            );
+        }
+
         setTimeout(() => {
-            // Replace the alert with the actual redirection
             window.location.href = "/exercises/visualization/player/";
         }, 1500);
     });

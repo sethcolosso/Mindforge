@@ -9,6 +9,7 @@ from .views import (
     MoodEntryViewSet,
     ExerciseViewSet,
     WorkoutSessionViewSet,
+    ExerciseOpenEventViewSet,
     BadgeViewSet,
     CoachRecommendationView,
     ProfessionalSearchView,
@@ -24,6 +25,7 @@ router.register(r'profile', ProfileViewSet, basename='profile')
 router.register(r'moods', MoodEntryViewSet, basename='mood')
 router.register(r'exercises', ExerciseViewSet, basename='exercise')
 router.register(r'workouts', WorkoutSessionViewSet, basename='workout')
+router.register(r'exercise-opens', ExerciseOpenEventViewSet, basename='exercise-open')
 router.register(r'badges', BadgeViewSet, basename='badge')
 
 urlpatterns = [

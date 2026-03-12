@@ -132,6 +132,32 @@
 
     
 
+    <div class="card">
+      <h3>Done with this session?</h3>
+      <button class="primary" id="anxietyCompleteBtn">✅ Mark Session Complete</button>
+  </div>
+
+  <script src="{% static 'api/js/exercise_tracking.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.MindForgeExerciseTracking) {
+        window.MindForgeExerciseTracking.trackOpenBySlug('2-min-anxiety-cooldown');
+      }
+      const btn = document.getElementById('anxietyCompleteBtn');
+      if (btn) {
+        btn.addEventListener('click', async function () {
+          const ok = window.MindForgeExerciseTracking
+            ? await window.MindForgeExerciseTracking.completeBySlug(
+                '2-min-anxiety-cooldown',
+                180,
+                'Ease anxiety session completed'
+              )
+            : false;
+          alert(ok ? 'Session logged successfully!' : 'Could not log session. Please sign in first.');
+        });
+      }
+    });
+  </script>
   <script src="{% static 'api/js/anxietyscripts.js' %}"></script>
 </body>
 </html>
