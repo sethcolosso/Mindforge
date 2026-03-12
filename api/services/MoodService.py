@@ -70,10 +70,15 @@ class MoodService:
 
     @staticmethod
     def get_mood_analytics(user: User) -> dict:
-        """Calculate mood analytics for dashboard"""
-        recent_moods = MoodEntry.objects.filter(
+        """Calculate mood analytics for dashboard.
+
+        `average` is intentionally based on the last 24 hours so it naturally
+        resets each day for the home card.
+        """
+        now = datetime.now()
+        last_30_days = MoodEntry.objects.filter(
             user=user,
-            created_at__gte=datetime.now() - timedelta(days=30)
+            created_at__gte=now - timedelta(days=30)
         )
 
         if not recent_moods.exists():
@@ -97,8 +102,8 @@ class MoodService:
         trend = 'improving' if last_week > prev_week else 'declining' if last_week < prev_week else 'stable'
 
         return {
-            'average': round(stats['avg_mood'] * 20, 1),  # Convert to percentage
-            'count': stats['total_count'],
+            'average': round((daily_avg or 0) * 20, 1),  # 24h average as percentage
+            'count': daily_count,
             'trend': trend,
             'latest': recent_moods.first().mood if recent_moods.exists() else None
         }
