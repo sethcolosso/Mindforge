@@ -92,5 +92,20 @@ def print_performance(data, initial_capital):
 
 # ========================== RUN ============================
 if __name__ =="__main__":
+
 #1. Get data
-df = get_data(TICKER, START_DATE, END_DATE)        
+df = get_data(TICKER, START_DATE, END_DATE)   
+
+#2. Generate Signals
+df= generate_signals(df, SHORT_WINDOW, LONG_WINDOW)
+
+#3. Backtest
+df = backtest(df, INITIAL_CAPITAL)
+
+#4. Results
+print_performance(df, INITIAL_CAPITAL)
+plot_results(df, TICKER)
+
+#optional: see last few rows
+print("\n Last 10 rows of signals:")
+print(df[['Close', 'SMA_Short', 'SMA_Long', 'Position', 'Equity']].tail(10))
