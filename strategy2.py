@@ -227,6 +227,73 @@ def plot (self):
     ax1.plot(df.index, df['sma_200'], label ='SMA' color='orange' alpha=0.8)
 
     if len(self.trades) > 0:
-        for
+        for _, t in self.trades.iterrows():
+            ax1.scatter(t['entry_date'], t['entry_price'], marker='-', color='lime', s=90, zorder=5)
+            ax1.scatter(t['exit_date'], t['exit_price'], marker='-', color='red', s=90, zorder=5)
+            
+    ax1.set_title(f"{self.ticker} - MACD + 200 SMA Trend Strategy", fontsize =14)
+    ax1.legend(loc='upper left')
+    ax1.grid(True, alpha =0.25)
+
+    #MACD
+    ax2 = axes[1]
+    ax2.plot(df.index, df['macd'], label='MACD', color='blue')
+    ax2.plot(df.index, df['macd_signal'], label='Signal', color='red', alpha=0.8)
+    ax2.plot(df.index, df['macd_hist'], label='Histogram', color='gray', alpha=0.4)
+    ax2.axhline(0, color='black', linewidth=0.7)
+    ax2.legend(loc='upper left')
+    ax2.grid(True, alpha=0.25)
+
+
+    #Position /Exposure
+    ax3 = axes[2]
+    position_series = (df['equity'] - df['equity'].shift(1).fillna(self.capital))
+    ax3.fill_between (df.index, df['equity'] > df['equity'].shift(1), alpha=0.3)
+    ax3.set_ylabel("Equity Changes")
+    ax3.grid(True, alpha=0.25)
+
+    #Equity curve
+    ax4 = axes[3]
+    ax4.plot(df.index, df['equity'], label='strategy', color= 'navy', linewidth=1.6)
+    ax4.plot(df.index, df['buy_hold'], label='buy  hold', color='darkorange', alpha=0.75)
+    ax4.set_ylabel("portfolio value ($)")
+    ax4.legend()
+    ax4.grid(True, alpha=0.25)
+
+    plt.tight_layout()
+    plt.show()
+
+def run(self):
+    (self.fetch_data()
+         .add_indicators()
+         .generate_signals()
+         .backtest()
+         .performance_report())
+     self.plot()
+     return self
+
+# ==============================================================================
+# RUN THE STRATEGY
+# ===============================================================================     
+
+if __name__ =="__main__":
+    strategy = MACDTrendsStrategy(
+        ticker="NVDA",
+        start="2012-02-09",
+        end="2025-01-01",
+        capital=1000000,
+        risk_per_trade=0.015,
+        stop_loss_pct=0.07,
+        trailing_stop_pct=0.10,
+        transaction_cost=0.001
+    )
+
+
+    strategy.run()
+    # Save trade log
+    if len(strategy.trades)>0:
+        strategy.trades.to_csv("macd_trades.csv", index= False)
+        print("\ntrade log  saved- macd_trades.csv")
+        
 
 
