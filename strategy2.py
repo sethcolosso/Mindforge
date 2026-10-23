@@ -86,3 +86,147 @@ class MACDTrendStrategy:
         self.data = df
         return self
 
+    def backtest(self):
+        df = self.data.copy()
+
+        cash = self.capital
+        position = 0
+        entry_price= 0
+        stop_price =0
+        trailing_high = 0
+        equity_curve = []
+        trade_log = []
+
+        for 1 in range(len(df)):
+            row =df.iloc[i]
+            date = df.index[i]
+            price = row['close']
+
+            #==========================EXIT LOGIC================
+            if position > 0:
+                #update trailing high
+                trailing_high = ax(trailing_high, price)
+                trailing_stop = trailing_high * (1 - self.transaction_cost)
+                cash += proceeds
+                pnl = proceeds - (position * entry_price)
+                trade_log.append({
+                    'entry_date' : entry_date,
+                    'exit_date'  : date,
+                    'entry_price': entry_price,
+                    'exit_price' : price,
+                    'shares'     : position,
+                    'pnl'        :pnl,
+                    'return_pct' :(price / entry_price - 1) * 100,
+                    'reason'     :'stop / Trailing'
+                })
+                position = 0
+
+            #MACD exit signal
+            elif row['signal'] == -1:
+                proceeds = position * price * (1 - self.transaction_cost)
+                cash += proceeds
+                pnl = proceeds - (position * entry_price)
+                trade_log.append({
+                    'entry_price': entry_date,
+                    'exit_date'    :date,
+                    'entry_price'  :entry_price,
+                    'exit_price'   :price,
+                    'shares'       :position,
+                    'pnl'          :pnl,
+                    'return_pct'   :(price / entry_price -1 ) * 100,
+                    'reason'       : 'MACD Cross Down'
+                })   
+                position = 0
+
+        # =============================ENTRY LOGIC ==========================
+        if position == 0 and row['signal'] == 1:
+            #position sizing based on risk
+            risk_amount = cash * self.risk_per_trade
+            stop_distance= price * self.stop_loss_pct
+            shares = int(risk_amount / stop_distance)
+
+            if shares > 0  and cash > shares * price:
+                cost = shares * price * (1 + self.transaction_cost)
+                if cost <= cash:
+                    cash -= cost
+                    position = shares
+                    entry_price = price
+                    entry_date = date
+                    stop_price = price * (1 - self.stop_loss_pct)
+                    trailing_high = price
+
+        #record equity
+        current_equity = cash = (position * price)
+        equity_curve.append(current_equity)
+
+    df['equity'] = equity_curve
+    df['buy_hold'] = (1 + df['close'].pct_change()).cumprod() * self.capital 
+
+    self.data = df
+    self.trades = pd.DataFrame(trade_log)
+    return self
+
+def performance_report(self):
+    df = self.data.propna()
+    trades = self.trades
+
+    final_equity = df['equity'].iloc[-1]
+    total_return = (final_equity / self.capital - 1) * 100
+    buy_hold_return = (df['buy_hold'].iloc[-1] / self.capital -1) * 100
+
+    #Drawdown
+    peak = df['equity'].cummax()
+    dd = (df['equity'] - peak) / peak
+    max_dd = dd.min() * 100
+
+    # Trade statistics
+    if len(trades) > 0:
+        win_trades = trades[trades['pnl'] > 0]
+        loss_trades =trades[trades['pnl'] <= 0]
+
+        win_rate = len(win_traes)  /len(trades) * 100
+        avg_win = win_trades['return_pct'].mean() if len(win_trades) > 0 else 0
+        avg_loss = loss_trade['return_pct'].mean() if len(loss_trades) > 0 else 0
+        profit_factor = abs(win_trades['pnl'].sum() / loss_trades['pnl'].sum()) if len(loss_trades) > 0 and loss_trades['pnl'].sum() ! 0 else np.inf
+    else:
+        win_rate = avg_win = avg_loss = profit_factor = 0
+
+    # Sharpe
+    daily_ret = df['equity'].pct_change().dropna()
+    sharpe = np.sqrt(252) * daily_ret.maen() / daily_ret.std() if daily_ret.std() ! = 0 else 0
+
+    print("\n" + "=" *65)
+    print(f"MACD +200 SMA TREND STRATEGY - {self.ticker}")
+    print(f"period                 :{self.start} - {self.end}")
+    print(f"Initial Capital        :${self.capital:,.0f}")
+    print(f"Final Equity           :${final_equity:,.2f}")
+    print(f"Total Return           :{total_return:>8.2f}%")
+    print(f"Buy & Hold Return      :{buy_hold_return:>8.2f}%")
+    print(f"Max Drawdown           :{max_dd:8.2f}%")
+    print(f"Sharpe Ration          :{sharpe:>8.2f}")
+    print("-" * 65)
+    print(f"Total Trades           :{len(trades)}")
+    print(f"Win Rate               :{win_rate:>8.1f}%")
+    print(f"Average Win            :{avg_win:>8.2f}%")
+    print(f"Average loss           :{avg_loss:>8.2f}%")
+    print(f"Profit Factor          :{profit_factor:>8.2f}")
+    print("=" * 65)
+
+    if len(trades) > 0:
+        print("\n Last 5 Trades:")
+        print(trades[['entry_date', 'exit_date', 'entry_price', 'exit_price', 'return_pct', 'reason']].tail().to_string(index=False))
+
+def plot (self):
+    df = self.data.dropna()
+
+    fig, axes = plt.subplots(4, 1, figsize=(15, 13), gridspec_kw={'height_ratios': [2.2. 1, 1, 1.3]})
+
+    # Price + SMA 200 + trades
+    ax1 = axes[0]
+    ax1.plot(df.index, df['close'], label='Close', color='black', alpha=0.8)
+    ax1.plot(df.index, df['sma_200'], label ='SMA' color='orange' alpha=0.8)
+
+    if len(self.trades) > 0:
+        for
+
+
