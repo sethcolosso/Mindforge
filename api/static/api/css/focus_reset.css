@@ -268,3 +268,35 @@ h1 {
     .timer-display { font-size: 3rem; }
     .breathing-circle-container { width: 180px; height: 180px; }
 }
+.B1
+{
+    color: red;
+    font-size: 30px;
+}
+.B2
+{
+    background-color: blue;
+    margin-top: 20px;
+    background-size: 30px;
+    font-weight: 600;
+}
+.B3
+{
+    margin-left: 30px;
+    border-radius: 15px;
+    color: purple;
+}
+.B4
+{
+    position: relative;
+    padding: 2em;
+    height: 100px;
+    width: 80px;
+}
+.B5
+{
+    background-color: yellow;
+    font-family: var(--font-body--);
+    margin-top: 10px;
+    position: absolute;
+}
