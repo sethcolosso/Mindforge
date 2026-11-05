@@ -314,4 +314,18 @@ textarea, input[type="text"] {
   transform: scale(1.05);
 }
 
-/* ...existing code... */
+#H1
+{
+  background-size: 60px;
+  color: purple;
+  font-size: 30px;
+  position: relative;
+}
+#H2
+{
+  padding: 3em;
+  height: 100px;
+  width: 70px;
+  font-family: var(--font-display--);
+  
+}
