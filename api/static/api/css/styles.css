@@ -213,7 +213,7 @@ body {
 .card2
 {
     background-color: red;
-    font-family: var(--body--)
+    font-family: var(--body--);
     padding: 2em;
     font-weight: 400;
 }
@@ -225,5 +225,23 @@ body {
 }
 .card4
 {
+   color: green;
+   position: absolute;
+   display: none;
+   text-align: center;
+
+}
+.card5
+{
+    background-size: 100px;
+    margin-top: 40px;
+    font-weight: 500;
+    color: red;
+}
+.card6
+{
+    font-family: var(--display--);
+    margin-right: 50px;
+    color: yellow;
     
 }
