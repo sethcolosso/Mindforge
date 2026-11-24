@@ -32,3 +32,4 @@ Notes:
 - API endpoints are under `/api/`.
 
 Next steps: connect a frontend, add Stripe and OpenAI keys, and tune privacy settings for production.
+saved the old version before doing changes

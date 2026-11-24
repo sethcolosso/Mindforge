@@ -202,3 +202,28 @@ body {
     }
     .exercise-icon { width: 90px; height: 90px; }
 }
+.card1
+{
+    padding: 3em;
+    position: relative;
+    font-size: 40px;
+    margin-bottom: 30px;
+
+}
+.card2
+{
+    background-color: red;
+    font-family: var(--body--)
+    padding: 2em;
+    font-weight: 400;
+}
+.card3
+{
+    margin-top: 30px;
+    background-size: 100px;
+    margin-bottom: 40px;    
+}
+.card4
+{
+    
+}
